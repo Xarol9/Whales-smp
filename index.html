@@ -1,3 +1,4 @@
+Morivis, [03.01.26 19:25]
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -7,153 +8,152 @@
     <style>
         body {
             background-color: #0f111a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background: rgba(255, 255, 255, 0.02);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px 20px;
-            display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-
-        .sidebar h2 {
-            font-size: 1.2rem;
-            color: #00d2ff;
-            margin: 0 0 10px 0;
-        }
-
-        .sidebar a {
-            color: #bbb;
-            text-decoration: none;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            color: #fff;
-            padding-left: 5px;
-        }
-
-        .btn-login {
-            margin-top: auto;
-            color: #5865F2 !important;
-            font-weight: bold;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 40px;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            padding: 50px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
             max-width: 800px;
-            width: 100%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            padding: 40px;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
             background: linear-gradient(90deg, #00d2ff, #3a7bd5);
             -webkit-background-clip: text;
+            background-clip: text; /* Додано для сумісності як на скриншоті 17 */
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
         }
 
         .status {
-            font-size: 0.9rem;
-            margin-bottom: 30px;
             color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
         }
 
-        .status b { color: #43b581; }
-
-        /* Buttons Grid */
-        .menu {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 40px;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border-radius: 12px;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #1e2124;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            background: #2f3136;
-            border-color: #3a7bd5;
-        }
-
+        /* Стиль кнопки входу */
         .btn-discord {
-            background: #5865F2;
-            border: none;
+            background-color: #5865F2;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            display: inline-block;
         }
 
-        .btn-discord:hover { background: #4752C4; }
-
-        /* Updates Section */
-        .updates {
-            background: rgba(0,0,0,0.3);
-            padding: 25px;
-            border-radius: 16px;
-            text-align: left;
+        .btn-discord:hover {
+            background-color: #4752c4;
+            transform: translateY(-2px);
         }
 
-        .updates h3 { margin-top: 0; color: #00d2ff; font-size: 1.1rem; }
-        
-        .update-list { list-style: none; padding: 0; margin: 0; }
-        .update-list li {
-            font-size: 0.9rem;
-            color: #ccc;
-            margin-bottom: 10px;
-            padding-left: 15px;
-            border-left: 2px solid #3a7bd5;
+        /* Стиль плашки профілю, коли ти вже увійшов */
+        .user-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: 0.3s;
         }
+
+        .user-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-pill img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #5865F2;
+        }
+
+        .user-pill span {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        nav {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #888;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        nav a:hover { color: white; }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <h2>🐳 Whales SMP</h2>
-        <a href="index.html">Головна</a>
-        <a href="wiki.html">Вікіпедія</a>
-        <a href="players.html">Учасники</a>
-        <a href="https://discord.com/oauth2/authorize?client_id=1457041207992516611&response_type=token&redirect_uri=https%3A%2F%2Fxarol9.github.io%2FWhales-smp%2Fprofile.html&scope=identify" class="btn-discord">
-    Логін через Discord
-</a>
-    </nav>
+    <div class="container">
+        <h1>Whales SMP</h1>
+        <p class="status">Приватний Minecraft сервер для друзів</p>
 
-    <main class="main-content">
-        <div class="container">
-            <h1>Вітаємо на Whales SMP!</h1>
-            <div class="status">Статус: <b>● Онлайн</b></div>
+        <div id="auth-section">
+            <a href="https://discord.com/oauth2/authorize?client_id=1457041207992516611&response_type=code&redirect_uri=https%3A%2F%2Fxarol9.github.io%2FWhales-smp%2Fprofile.html&scope=identify" class="btn-discord">
+                Увійти через Discord
+            </a>
+        </div>
+
+        <nav>
+            <a href="wiki.html">Вікіпедія</a>
+            <a href="players.html">Гравці</a>
+            <a href="map.html">Карта</a>
+        </nav>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const token = localStorage.getItem('discord_token');
+            const authSection = document.getElementById('auth-section');
+
+            if (token) {
+                // Завантажуємо дані користувача
+                fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Expired');
+                    return res.json();
+                })
+                .then(data => {
+                    // Якщо все ок, показуємо аватарку і нік як на скриншоті 16
+                    authSection.innerHTML = `
+                        <div class="user-pill" onclick="location.href='profile.html'">
+                            <img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png" alt="Avatar">
+                            <span>${data.username}</span>
+
+Morivis, [03.01.26 19:25]
+</div>
+                    `;
+                })
+                .catch(() => {
+                    // Якщо токен старий - нічого не міняємо (залишається кнопка входу)
+                    localStorage.removeItem('discord_token');
+                });
+            }
+        }
+
+        // Запуск перевірки
+        checkLogin();
+    </script>
+</body>
+</html>
