@@ -2,75 +2,55 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Мій Профіль | Whales SMP</title>
+    <title>Профіль Whales SMP</title>
     <style>
-        body { background-color: #0f111a; color: white; font-family: sans-serif; display: flex; margin: 0; }
-        .sidebar { width: 240px; border-right: 1px solid #333; padding: 20px; height: 100vh; }
-        .main { flex-grow: 1; padding: 50px; display: flex; justify-content: center; }
-        
-        .profile-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            width: 400px;
-        }
-
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid #5865f2;
-            margin-bottom: 20px;
-        }
-
-        .status-badge {
-            background: #43b581;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .stat-box {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 10px;
-        }
+        body { background: #0f111a; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .card { background: #1c1f2b; padding: 30px; border-radius: 15px; display: inline-block; border: 1px solid #333; }
+        #avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #5865f2; margin-bottom: 15px; }
+        .btn { background: #ed4245; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <nav class="sidebar">
-        <h2>🐳 Whales SMP</h2>
-        <a href="index.html" style="color: #ccc; text-decoration: none;">На головну</a>
-    </nav>
 
-    <div class="main">
-        <div class="profile-card">
-            <div id="user-info">
-                <img src="https://via.placeholder.com/120" class="avatar" id="avatar">
-                <h2 id="username">Завантаження...</h2>
-                <div class="status-badge">Гравець</div>
-                
-                <div class="stats">
-                    <div class="stat-box">🕒 Час у грі: <b>128 год</b></div>
-                    <div class="stat-box">💎 Алмази: <b>42</b></div>
-                </div>
-
-                <button onclick="logout()" style="margin-top: 30px; background: #ed4245; border: none; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Вийти</button>
-            </div>
+    <div class="card">
+        <img id="avatar" src="https://cdn.discordapp.com/embed/avatars/0.png">
+        <h2 id="username">Завантаження...</h2>
+        <p style="color: #43b581;">● Гравець Whales SMP</p>
+        <div style="margin: 20px 0; font-size: 0.9rem; color: #888;">
+            Час у грі: 128 год | Алмази: 42
         </div>
+        <button class="btn" onclick="location.href='index.html'">Вийти</button>
     </div>
+
+    <script>
+        // Беремо токен з адреси (він там вже є на твоєму скріншоті №11)
+        const token = new URLSearchParams(window.location.hash.slice(1)).get('access_token');
+
+        if (!token) {
+            window.location.href = 'index.html';
+        } else {
+            // Запит до Discord (тут я додав усі потрібні лапки)
+            fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Ставимо нікнейм
+                document.getElementById('username').innerText = data.username;
+                
+                // Ставимо аватарку
+                if (data.avatar) {
+                    document.getElementById('avatar').src = 'https://cdn.discordapp.com/avatars/' + data.id + '/' + data.avatar + '.png';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('username').innerText = "Помилка входу";
+            });
+        }
+    </script>
+
 </body>
 </html>
