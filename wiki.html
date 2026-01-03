@@ -2,76 +2,134 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Whales SMP | Wiki</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whales Wiki | Правила та Інфо</title>
     <style>
         body {
-            background-color: #1a1b1e; /* Темний фон як у ДС */
+            background-color: #0f111a;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             margin: 0;
             display: flex;
+            min-height: 100vh;
         }
-        /* Бокове меню */
+
+        /* Sidebar для Вікі */
         .sidebar {
-            width: 250px;
-            background-color: #2f3136; /* Колір списку каналів */
+            width: 260px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: sticky;
+            top: 0;
             height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #4f545c;
         }
-        .sidebar h2 { color: #00b0f4; font-size: 1.2rem; }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li { margin: 10px 0; }
-        .sidebar a { color: #b9bbbe; text-decoration: none; transition: 0.3s; }
-        .sidebar a:hover { color: #ffffff; }
+
+        .sidebar h2 { color: #00d2ff; font-size: 1.2rem; margin-bottom: 20px; }
+        
+        .sidebar-link {
+            color: #bbb;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(58, 123, 213, 0.2);
+            color: #fff;
+            border-left: 3px solid #3a7bd5;
+        }
 
         /* Основний контент */
-        .main-content {
+        .content {
             flex-grow: 1;
-            padding: 40px;
-            max-width: 800px;
+            padding: 50px;
+            max-width: 900px;
+            line-height: 1.6;
         }
-        .rule-card {
-            background: #36393f;
-            padding: 20px;
-            border-radius: 8px;
+
+        .wiki-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+
+        h1 { font-size: 2.5rem; color: #00d2ff; margin-bottom: 30px; }
+        h2 { color: #3a7bd5; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        
+        .back-link {
+            display: inline-block;
             margin-bottom: 20px;
-            border-left: 4px solid #5865F2;
+            color: #3a7bd5;
+            text-decoration: none;
+            font-size: 0.9rem;
         }
-        .back-link { color: #5865F2; text-decoration: none; display: block; margin-bottom: 20px; }
+
+        .back-link:hover { text-decoration: underline; }
+
+        /* Стиль для списків команд */
+        code {
+            background: #1e2124;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffcc00;
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <h2>🐳 Whales Wiki</h2>
-        <ul>
-            <li><a href="#rules">📕 Правила</a></li>
-            <li><a href="#roles">👥 Ролі</a></li>
-            <li><a href="#commands">🛠️ Команди</a></li>
-            <li><a href="players.html">👥 Учасники</a></li> <li><a
-            <li><a href="index.html">⬅️ На головну</a></li>
-        </ul>
-    </div>
+        <a href="index.html" class="sidebar-link">🏠 На головну</a>
+        <a href="#rules" class="sidebar-link active">📜 Правила</a>
+        <a href="#roles" class="sidebar-link">👥 Ролі та Ієрархія</a>
+        <a href="#commands" class="sidebar-link">⌨️ Команди</a>
+        <a href="players.html" class="sidebar-link">👤 Учасники</a>
+    </nav>
 
-    <div class="main-content">
+    <main class="content">
         <a href="index.html" class="back-link">← Повернутися на сайт</a>
-        
-        <h1 id="rules">Правила сервера</h1>
-        <div class="rule-card">
-            <h3>1. Загальна поведінка</h3>
-            <p>Будьте ввічливими. Заборонено спам та флуд, як і в каналі #💬-загальний-чат.</p>
-        </div>
+        <h1>База знань Whales SMP</h1>
 
-        <h1 id="roles">Ієрархія ролей</h1>
-        <p>На нашому сервері діють такі основні ролі:</p>
-        <ul>
-            <li><strong>Глава</strong> — засновник проекту.</li>
-            <li><strong>Адміністратори</strong> — керування технічною частиною.</li>
-            <li><strong>Dev</strong> — розробка сайту та ботів.</li>
-            <li><strong>Еліта</strong> — особливий статус для досвідчених гравців.</li>
-        </ul>
-    </div>
+        <section id="rules" class="wiki-section">
+            <h2>📜 Основні правила</h2>
+            <p>На нашому сервері ми цінуємо адекватність та взаємоповагу. Основні заборони:</p>
+            <ul>
+                <li><b>Гриферство:</b> Заборонено руйнувати чужі будівлі без згоди власника.</li>
+                <li><b>Чіти:</b> Будь-які сторонні програми (X-Ray і т.д.) призводять до вічного бану.</li>
+                <li><b>Токсичність:</b> Образи в чаті не вітаються.</li>
+            </ul>
+        </section>
+
+        <section id="roles" class="wiki-section">
+            <h2>👥 Ролі на сервері</h2>
+            <ul>
+                <li><b style="color: #ed4245;">Глава</b> — засновник проекту.</li>
+                <li><b style="color: #faa61a;">Адміністратор</b> — слідкує за технічним станом.</li>
+                <li><b style="color: #43b581;">Гравець</b> — звичайний житель нашого світу.</li>
+            </ul>
+        </section>
+
+        <section id="commands" class="wiki-section">
+            <h2>⌨️ Корисні команди</h2>
+            <p>Команди, які стануть тобі у пригоді:</p>
+            <ul>
+                <li><code>/spawn</code> — повернутися на спавн.</li>
+                <li><code>/msg [нік]</code> — приватне повідомлення гравцю.</li>
+                <li><code>/co i</code> — перевірити, хто поставив або зламав блок (для логів).</li>
+            </ul>
+        </section>
+    </main>
 
 </body>
 </html>
