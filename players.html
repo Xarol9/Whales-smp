@@ -2,79 +2,218 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Учасники | Whales SMP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whales SMP — Спільнота</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        body { 
-            background-color: #1a1b1e; 
-            color: #ffffff; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 40px; 
-            display: flex; flex-direction: column; align-items: center;
-        }
-        h1 { margin-bottom: 10px; }
-        .back-link { color: #5865f2; text-decoration: none; margin-bottom: 30px; display: block; }
-        
-        /* Сітка для карток гравців */
-        .players-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px; 
-            width: 100%; max-width: 1000px; 
+        :root {
+            --accent: #00d2ff;
+            --danger: #ff4d4d;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.08);
         }
 
-        /* Стиль картки гравця */
-        .player-card { 
-            background: #2f3136; 
-            padding: 20px; 
-            border-radius: 15px; 
-            text-align: center; 
-            border: 1px solid #444;
+        /* Навігація вкладок */
+        .tabs-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 40px 0;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: #777;
+            padding: 12px 30px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: 0.4s;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(0, 210, 255, 0.2);
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.5s ease-out; }
+        .tab-content.active { display: block; }
+
+        /* Сітка гравців */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             transition: 0.3s;
         }
-        .player-card:hover { transform: translateY(-5px); border-color: #5865f2; }
-        
-        /* Голова гравця */
-        .player-card img { 
-            width: 100px; height: 100px; 
-            image-rendering: pixelated; /* Щоб пікселі були чіткими як у майнкрафті */
-            margin-bottom: 15px; 
+
+        .player-card:hover {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-3px);
         }
 
-        .nickname { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
-        .role { font-size: 0.8rem; font-weight: bold; padding: 3px 10px; border-radius: 5px; text-transform: uppercase; }
-        
-        /* Кольори ролей */
-        .admin { background: #ed4245; color: white; }
-        .member { background: #43b581; color: white; }
+        .p-avatar { width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--border); }
+
+        .status-online { width: 8px; height: 8px; background: #4caf50; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 10px #4caf50; }
+
+        /* Картки Кланів */
+        .clan-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: 0.4s;
+        }
+
+        .clan-box:hover { border-color: rgba(255,255,255,0.2); }
+
+        .clan-banner {
+            height: 100px;
+            background: linear-gradient(90deg, rgba(0,210,255,0.1), transparent);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            justify-content: space-between;
+        }
+
+        .clan-banner.asn { background: linear-gradient(90deg, rgba(255,77,77,0.1), transparent); }
+
+        .clan-logo-text { display: flex; align-items: center; gap: 20px; }
+        .clan-icon { font-size: 2.5rem; }
+
+        .clan-details { padding: 30px; }
+
+        .member-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px 15px;
+            border-radius: 12px;
+            margin: 5px;
+            border: 1px solid var(--border);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link">← На головну</a>
-    <h1>👥 Учасники Whales SMP</h1>
-    <p>Список тих, хто вже з нами</p>
+<nav>
+    <div class="nav-left">
+        <a href="index.html" class="logo">WHALES.</a>
+        <div class="nav-links">
+            <a href="index.html">Головна</a>
+            <a href="players.html" class="active">Спільнота</a>
+            <a href="wiki.html">Архів</a>
+        </div>
+    </div>
+</nav>
 
-    <div class="players-grid">
+<div class="container">
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="showTab('p-tab')">Гравці (23)</button><button class="tab-btn" onclick="showTab('c-tab')">Клани (2)</button>
+    </div>
 
-        <div class="player-card">
-            <img src="https://mc-heads.net/head/Alberr0" alt="Alberr0">
-            <div class="nickname">Alberr0</div>
-            <span class="role admin">Засновник</span>
+    <div id="p-tab" class="tab-content active">
+        <div class="players-grid">
+            <div class="player-card">
+                <img src="https://mc-heads.net/avatar/Tasara/48" class="p-avatar">
+                <div>
+                    <div style="font-weight: 800; font-size: 1rem;"><span class="status-online"></span> Tasara</div>
+                    <div style="font-size: 0.7rem; color: var(--danger); font-weight: 900; text-transform: uppercase;">Assassins</div>
+                </div>
+            </div>
+
+            <div class="player-card">
+                <img src="https://mc-heads.net/avatar/Steve/48" class="p-avatar">
+                <div>
+                    <div style="font-weight: 800; font-size: 1rem;"><span class="status-online" style="background:#555; box-shadow:none;"></span> Alberr0</div>
+                    <div style="font-size: 0.7rem; color: var(--accent); font-weight: 900; text-transform: uppercase;">Whales</div>
+                </div>
+            </div>
+
+            </div>
+    </div>
+
+    <div id="c-tab" class="tab-content">
+        
+        <div class="clan-box">
+            <div class="clan-banner">
+                <div class="clan-logo-text">
+                    <div class="clan-icon">🐋</div>
+                    <div>
+                        <h2 style="margin:0;">Whales</h2>
+                        <span style="font-size: 0.8rem; color: var(--accent);">Основний склад сервера</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 900; font-size: 1.2rem;">22</div>
+                    <div style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Гравців</div>
+                </div>
+            </div>
+            <div class="clan-details">
+                <p style="color: #888; margin-bottom: 20px;">Спільнота засновників та вільних будівельників. Ми розвиваємо цей світ разом.</p>
+                <div class="members-list">
+                    <div class="member-tag"><img src="https://mc-heads.net/avatar/Steve/20"> Steve</div>
+                    </div>
+            </div>
         </div>
 
-        <div class="player-card">
-            <img src="https://mc-heads.net/head/tasara" alt="tasara">
-            <div class="nickname">tasara</div>
-            <span class="role member">Гравець</span>
-        </div>
-
-        <div class="player-card">
-            <img src="https://mc-heads.net/head/Mr_yayku" alt="Mr_yayku">
-            <div class="nickname">Mr_yayku</div>
-            <span class="role member">Гравець</span>
+        <div class="clan-box" style="border-color: rgba(255, 77, 77, 0.2);">
+            <div class="clan-banner asn">
+                <div class="clan-logo-text">
+                    <div class="clan-icon">🗡️</div>
+                    <div>
+                        <h2 style="margin:0;">Assassins Order</h2>
+                        <span style="font-size: 0.8rem; color: var(--danger);">Елітна варта та правосуддя</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 900; font-size: 1.2rem; color: var(--danger);">1</div>
+                    <div style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Гравців</div>
+                </div>
+            </div>
+            <div class="clan-details">
+                <p style="color: #888; margin-bottom: 20px;">Таємний орден, що стоїть на захисті 23-х. Ми караємо за гриферство та відновлюємо справедливість.</p>
+                <div class="members-list">
+                    <div class="member-tag" style="border-color: var(--danger);">
+                        <img src="https://mc-heads.net/avatar/Tasara/20"> 
+                        <b>Tasara</b> 
+                        <span style="font-size: 0.6rem; color: var(--danger); margin-left: 5px;">MASTER</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
 
 </body>
 </html>

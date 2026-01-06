@@ -3,133 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whales Wiki | Правила та Інфо</title>
+    <title>Whales SMP | Absolute Wiki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
+        /* ========================================
+           ULTIMATE DESIGN SYSTEM
+           ======================================== */
+        :root {
+            --p: #00d2ff; --p-glow: rgba(0, 210, 255, 0.4);
+            --s: #bd00ff; --s-glow: rgba(189, 0, 255, 0.4);
+            --a: #00ff88; --a-glow: rgba(0, 255, 136, 0.4);
+            --danger: #ff2a6d; --warning: #f2e307;
+            --bg: #010204; --card: rgba(15, 20, 30, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --ts: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(var(--p), var(--s)); border-radius: 10px; }
+
         body {
-            background-color: #0f111a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
+            background: var(--bg); color: #c9d1d9; font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden; min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(189, 0, 255, 0.05) 0%, transparent 40%);
         }
 
-        /* Sidebar для Вікі */
-        .sidebar {
-            width: 260px;
-            background: rgba(255, 255, 255, 0.02);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: sticky;
-            top: 0;
-            height: 100vh;
+        /* Анімований фон частинок */
+        #particles-js {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
         }
 
-        .sidebar h2 { color: #00d2ff; font-size: 1.2rem; margin-bottom: 20px; }
+        /* ========================================
+           HEADER & EXTERNAL NAVIGATION
+           ======================================== */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            backdrop-filter: blur(25px); border-bottom: 1px solid var(--border);
+            background: rgba(1, 2, 4, 0.85);
+        }
+        .nav-inner {
+            max-width: 1600px; margin: 0 auto; height: 110px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 50px;
+        }
+
+        /* Лого повертає на головну цієї сторінки */
+        .logo { 
+            font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #fff; font-weight: 900;
+            text-decoration: none; letter-spacing: 5px; cursor: pointer; transition: var(--ts);
+        }
+        .logo span { color: var(--p); text-shadow: 0 0 15px var(--p-glow); }
+        .logo:hover { letter-spacing: 8px; filter: brightness(1.2); }
+
+        /* Кнопка на зовнішній index.html */
+        .exit-btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+            color: #fff; padding: 12px 25px; border-radius: 15px; font-weight: 800;
+            font-family: 'Orbitron'; font-size: 0.7rem; text-decoration: none;
+            transition: var(--ts); display: flex; align-items: center; gap: 10px;
+        }
+        .exit-btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; transform: translateY(-3px); }
+
+        .tab-wrap { display: flex; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 20px; border: 1px solid var(--border); }
+        .tab {
+            padding: 12px 25px; border-radius: 14px; cursor: pointer; color: #666;
+            font-weight: 700; font-size: 0.8rem; transition: var(--ts); text-transform: uppercase;
+        }
+        .tab.active { background: var(--p); color: #000; box-shadow: 0 0 25px var(--p-glow); }
+
+        /* ========================================
+           VIEWPORT & CARDS
+           ======================================== */
+        .viewport { max-width: 1400px; margin: 160px auto 100px; padding: 0 40px; }
+        .page { display: none; opacity: 0; transform: scale(0.98); }
+        .page.active { display: block; animation: zoomIn 0.6s forwards cubic-bezier(0.17, 0.84, 0.44, 1); }
         
-        .sidebar-link {
-            color: #bbb;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        @keyframes zoomIn { to { opacity: 1; transform: scale(1); } }
+
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 60px;
+            padding: 80px; margin-bottom: 50px; position: relative; overflow: hidden;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.6);
         }
 
-        .sidebar-link:hover, .sidebar-link.active {
-            background: rgba(58, 123, 213, 0.2);
-            color: #fff;
-            border-left: 3px solid #3a7bd5;
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 5.5rem; letter-spacing: -4px; margin-bottom: 30px; line-height: 0.9; }
+        h1 span { color: var(--p); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
+        .module {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            padding: 45px; border-radius: 40px; transition: var(--ts);
+        }
+        .module:hover { border-color: var(--p); transform: translateY(-15px) rotateZ(1deg); background: rgba(0, 210, 255, 0.03); }
+
+        .data-panel {
+            font-family: 'JetBrains Mono', monospace; background: #000;
+            padding: 25px; border-radius: 20px; border-left: 6px solid var(--p);
+            color: #fff; font-size: 0.9rem; margin: 20px 0; line-height: 1.7;
         }
 
-        /* Основний контент */
-        .content {
-            flex-grow: 1;
-            padding: 50px;
-            max-width: 900px;
-            line-height: 1.6;
+        /* КНОПКА ПОВЕРНУТИСЯ (INTERNAL) */
+        .back-nav {
+            display: inline-flex; align-items: center; gap: 12px;
+            padding: 18px 35px; border-radius: 20px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); color: var(--p); font-weight: 800;
+            cursor: pointer; transition: var(--ts); text-transform: uppercase;
+            font-family: 'Orbitron'; font-size: 0.75rem; margin-bottom: 40px;
         }
+        .back-nav:hover { background: var(--p); color: #000; box-shadow: 0 0 30px var(--p-glow); }
 
-        .wiki-section {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 40px;
-        }
+        .badge { display: inline-block; padding: 6px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: 900; background: var(--p); color: #000; margin-bottom: 15px; }
 
-        h1 { font-size: 2.5rem; color: #00d2ff; margin-bottom: 30px; }
-        h2 { color: #3a7bd5; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #3a7bd5;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .back-link:hover { text-decoration: underline; }
-
-        /* Стиль для списків команд */
-        code {
-            background: #1e2124;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #ffcc00;
-        }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <h2>🐳 Whales Wiki</h2>
-        <a href="index.html" class="sidebar-link">🏠 На головну</a>
-        <a href="#rules" class="sidebar-link active">📜 Правила</a>
-        <a href="#roles" class="sidebar-link">👥 Ролі та Ієрархія</a>
-        <a href="#commands" class="sidebar-link">⌨️ Команди</a>
-        <a href="players.html" class="sidebar-link">👤 Учасники</a>
-    </nav>
+    <div id="particles-js"></div>
 
-    <main class="content">
-        <a href="index.html" class="back-link">← Повернутися на сайт</a>
-        <h1>База знань Whales SMP</h1>
+    <header>
+        <div class="nav-inner">
+            <a href="javascript:void(0)" class="logo" onclick="nav('main')">WHALES<span>.</span>OS</a>
+            
+            <div class="tab-wrap">
+                <div class="tab active" id="tab-main" onclick="nav('main')">System</div>
+                <div class="tab" id="tab-magic" onclick="nav('magic')">Magic</div>
+                <div class="tab" id="tab-brew" onclick="nav('brew')">Alchemy</div>
+                <div class="tab" id="tab-boss" onclick="nav('boss')">Slayers</div>
+                <div class="tab" id="tab-rules" onclick="nav('rules')">Laws</div>
+            </div>
 
-        <section id="rules" class="wiki-section">
-            <h2>📜 Основні правила</h2>
-            <p>На нашому сервері ми цінуємо адекватність та взаємоповагу. Основні заборони:</p>
-            <ul>
-                <li><b>Гриферство:</b> Заборонено руйнувати чужі будівлі без згоди власника.</li>
-                <li><b>Чіти:</b> Будь-які сторонні програми (X-Ray і т.д.) призводять до вічного бану.</li>
-                <li><b>Токсичність:</b> Образи в чаті не вітаються.</li>
-            </ul>
-        </section>
+            <a href="index.html" class="exit-btn">
+                <span>INDEX.HTML</span>
+                <span style="font-size: 1.2rem;">↗</span>
+            </a>
+        </div>
+    </header>
 
-        <section id="roles" class="wiki-section">
-            <h2>👥 Ролі на сервері</h2>
-            <ul>
-                <li><b style="color: #ed4245;">Глава</b> — засновник проекту.</li>
-                <li><b style="color: #faa61a;">Адміністратор</b> — слідкує за технічним станом.</li>
-                <li><b style="color: #43b581;">Гравець</b> — звичайний житель нашого світу.</li>
-            </ul>
-        </section>
+    <div class="viewport">
 
-        <section id="commands" class="wiki-section">
-            <h2>⌨️ Корисні команди</h2>
-            <p>Команди, які стануть тобі у пригоді:</p>
-            <ul>
-                <li><code>/spawn</code> — повернутися на спавн.</li>
-                <li><code>/msg [нік]</code> — приватне повідомлення гравцю.</li>
-                <li><code>/co i</code> — перевірити, хто поставив або зламав блок (для логів).</li>
-            </ul>
-        </section>
-    </main>
+        <div id="main" class="page active">
+            <div class="card">
+                <div class="badge">SECURITY CLEARANCE: ADMIN</div>
+                <h1>Absolute Intelligence<span>.</span></h1>
+                <p style="font-size: 1.5rem; max-width: 800px; color: #888; margin-top: 20px;">Глобальна база даних Whales SMP активована. Використовуйте модулі для навігації по метаданим сервера.</p>
+                
+                <div class="grid" style="margin-top: 70px;">
+                    <div class="module" onclick="nav('magic')" style="cursor:pointer;">
+                        <h3 style="font-family: 'Orbitron'; font-size: 1.5rem; color: #fff;">🔮 Arcane Repository</h3>
+                        <p>Документація по зачаруванням вищого рівня та конфліктам магії.</p>
+                    </div>
+                    <div class="module" onclick="nav('brew')" style="cursor:pointer;">
+                        <h3 style="font-family: 'Orbitron'; font-size: 1.5rem; color: #fff;">🧪 Chemical Files</h3>
+                        <p>Повний реєстр бойових еліксирів та заборонених сумішей.</p>
+                    </div>
+                    <div class="module" onclick="nav('boss')" style="cursor:pointer;">
+                        <h3 style="font-family: 'Orbitron'; font-size: 1.5rem; color: #fff;">🐉 Slayer Tactics</h3>
+                        <p>Стратегії знищення Ендер Дракона, Візера та Вардена.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div id="magic" class="page">
+            <button class="back-nav" onclick="nav('main')">← SYSTEM_BACK</button>
+            <div class="card">
+                <h1>Arcane Archive<span>.</span></h1>
+                <div class="grid">
+                    <div class="module">
+                        <h3 style="color: var(--s);">⚔️ Weaponry</h3>
+                        <div class="data-panel">
+                            Sharpness V + Looting III + Mending + Fire Aspect II + Sweeping Edge III
+                        </div>
+                    </div>
+                    <div class="module">
+                        <h3 style="color: var(--p);">🛡️ Defense</h3>
+                        <div class="data-panel">
+                            Prot IV + Unbreaking III + Mending + Thorns III + Swift Sneak III
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div id="brew" class="page">
+            <button class="back-nav" onclick="nav('main')">← SYSTEM_BACK</button>
+            <div class="card">
+                <h1>Alchemy Lab<span>.</span></h1>
+                <div class="grid">
+                    <div class="module">
+                        <h2 style="color: var(--a);">⚡ Stimulants</h2>
+                        <div class="data-panel">
+                            <b>STR II:</b> Wart > Blaze > Glowstone<br>
+                            <b>SPD II:</b> Wart > Sugar > Glowstone
+                        </div>
+                    </div>
+                    <div class="module">
+                        <h2 style="color: var(--danger);">💀 Lethals</h2>
+                        <div class="data-panel">
+                            <b>Harming II:</b> Instant Heal + Fermented Eye
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <div id="boss" class="page">
+            <button class="back-nav" onclick="nav('main')">← SYSTEM_BACK</button>
+            <div class="card">
+                <h1>Boss Slayer Guide<span>.</span></h1>
+                <div class="grid">
+                    <div class="module">
+                        <h3>🐉 Ender Dragon</h3>
+                        <p>Використовуйте ліжка для максимальної шкоди. Стріляйте в кристали залізними прутами.</p>
+                    </div>
+                    <div class="module">
+                        <h3>💀 The Wither</h3>
+                        <p>Бийтеся під бедроком або в печерах. Зілля сили II обов'язкове.</p>
+                    </div>
+                    <div class="module" style="border-color: var(--danger);">
+                        <h3>🔊 The Warden</h3>
+                        <p><b>НЕ БИТИСЯ.</b> Тільки стелс. Використовуйте сніжки для відволікання.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="rules" class="page">
+            <button class="back-nav" onclick="nav('main')">← SYSTEM_BACK</button>
+            <div class="card">
+                <h1>Server Codex<span>.</span></h1>
+                <div class="data-panel">
+                    1. Гриферство = Перманентний бан.<br>
+                    2. Крадіжки = Конфіскація майна + тюрма.<br>
+                    3. Чіти/Дюпи = Миттєве видалення з вайтліста.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // 1. НАВІГАЦІЯ
+        function nav(id) {
+            // Ховаємо всі сторінки
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Деактивуємо всі таби
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            // Показуємо потрібну
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            
+            // Підсвічуємо таб
+            const activeTab = document.getElementById('tab-' + id);
+            if(activeTab) activeTab.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 2. ІНІЦІАЛІЗАЦІЯ ЧАСТИНК
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60 },
+                "color": { "value": "#00d2ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#00d2ff", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 1 }
+            },
+            "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } }
+        });
+    </script>
 </body>
 </html>

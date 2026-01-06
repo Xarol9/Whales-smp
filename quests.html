@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whales SMP | Біржа замовлень</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --accent: #00d2ff; 
+            --bg: #050608; 
+            --card: rgba(20, 22, 28, 0.6); 
+            --border: rgba(255, 255, 255, 0.08); 
+        }
+
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-image: radial-gradient(circle at 50% -20%, #1a2a3a 0%, #050608 60%);
+            min-height: 100vh;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .nav-brand { font-weight: 800; font-size: 1.5rem; color: var(--accent); letter-spacing: -1px; text-decoration: none; }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-links a { color: #aaa; text-decoration: none; font-size: 0.85rem; padding: 10px 15px; border-radius: 12px; transition: 0.3s; }
+        .nav-links a:hover { color: white; background: rgba(255,255,255,0.05); }
+        
+        .profile-btn {
+            display: flex; align-items: center; gap: 10px; background: var(--card);
+            padding: 6px 15px; border-radius: 50px; border: 1px solid var(--border);
+            text-decoration: none; color: white; font-size: 0.9rem;
+        }
+
+        /* --- CONTENT --- */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+
+        .header-section {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 30px;
+        }
+        .header-section h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+
+        .btn-add {
+            background: var(--accent); color: black; border: none;
+            padding: 14px 25px; border-radius: 16px; font-weight: 800;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(0,210,255,0.2);
+        }
+        .btn-add:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,210,255,0.4); }
+
+        /* --- QUEST CARDS --- */
+        .quest-list { display: flex; flex-direction: column; gap: 20px; }
+        
+        .quest-card {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 25px; border-radius: 28px; backdrop-filter: blur(10px);
+            display: grid; grid-template-columns: auto 1fr auto; gap: 25px; align-items: center;
+            transition: 0.3s;
+        }
+        .quest-card:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+
+        .author-info { text-align: center; border-right: 1px solid var(--border); padding-right: 25px; min-width: 80px; }
+        .author-head { width: 50px; height: 50px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .author-name { font-size: 0.75rem; color: #777; font-weight: 600; display: block; }
+
+        .quest-main h3 { margin: 0 0 8px 0; font-size: 1.3rem; color: white; }
+        .quest-main p { margin: 0; color: #999; font-size: 0.95rem; line-height: 1.5; }
+
+        .reward-box { text-align: right; }
+        .reward-label { font-size: 0.65rem; color: #555; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .reward-val { background: rgba(0,210,255,0.1); color: var(--accent); padding: 10px 18px; border-radius: 14px; font-weight: 800; display: inline-block; }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-box { 
+            background: #111218; border: 1px solid var(--border); 
+            padding: 40px; border-radius: 35px; width: 100%; max-width: 450px;
+        }
+        .modal-box h2 { margin-top: 0; font-size: 1.8rem; margin-bottom: 25px; }
+
+        input, textarea {
+            width: 100%; background: #08090b; border: 1px solid var(--border);
+            color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px;
+            box-sizing: border-box; font-family: inherit; font-size: 0.95rem;
+        }
+        input:focus, textarea:focus { border-color: var(--accent); outline: none; }
+
+        .btn-submit { width: 100%; background: var(--accent); color: black; border: none; padding: 18px; border-radius: 15px; font-weight: 800; cursor: pointer; }
+        .btn-cancel { width: 100%; background: none; color: #555; border: none; margin-top: 15px; cursor: pointer; font-weight: 600; }
+
+        /* --- EMPTY STATE --- */
+        .empty-msg { text-align: center; padding: 60px; color: #444; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-brand">WHALES.</a>
+    <div class="nav-links">
+        <a href="index.html">Головна</a>
+        <a href="news.html">Новини</a>
+        <a href="wiki.html">Вікі</a>
+        <a href="quests.html" style="color: white; font-weight: 800;">Біржа</a>
+        <a href="shop.html">Магазин</a>
+    </div>
+    <a href="profile.html" class="profile-btn">
+        <img id="p-head" src="" style="width: 24px; height: 24px; border-radius: 6px;">
+        <span id="p-nick">...</span>
+    </a>
+</nav>
+
+<div class="container">
+    <div class="header-section">
+        <div>
+            <h1>Біржа праці</h1>
+            <p style="color: #666; margin: 5px 0 0 0;">Допомагай іншим та заробляй ресурси</p>
+        </div>
+        <button class="btn-add" onclick="toggleModal(true)">+ НОВЕ ЗАМОВЛЕННЯ</button>
+    </div>
+
+    <div class="quest-list" id="q-container">
+        <div class="quest-card">
+            <div class="author-info">
+                <img src="https://mc-heads.net/avatar/Steve/50" class="author-head">
+                <span class="author-name">Steve</span>
+            </div>
+            <div class="quest-main">
+                <h3>Потрібен декор для спавну</h3>
+                <p>Шукаю будівельника, який вміє гарно працювати з листям та деревом. Матеріали надаю.</p>
+            </div>
+            <div class="reward-box">
+                <span class="reward-label">Нагорода</span>
+                <div class="reward-val">💎 32 Алмази</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-wrap">
+    <div class="modal-box">
+        <h2>Створити замовлення</h2>
+        <input type="text" id="in-title" placeholder="Що потрібно зробити?">
+        <textarea id="in-desc" rows="4" placeholder="Деталі, координати, терміни..."></textarea>
+        <input type="text" id="in-reward" placeholder="Нагорода (напр. 5000$ або Шалкер)">
+        
+        <button class="btn-submit" onclick="submitQuest()">ОПУБЛІКУВАТИ</button>
+        <button class="btn-cancel" onclick="toggleModal(false)">Скасувати</button>
+    </div>
+</div>
+
+<script>
+    // 1. АВТОРИЗАЦІЯ
+    const myNick = localStorage.getItem('playerNick') || "Гість";
+    document.getElementById('p-nick').innerText = myNick;
+    document.getElementById('p-head').src = "https://mc-heads.net/avatar/" + myNick + "/24";
+
+    // 2. УПРАВЛІННЯ МОДАЛКОЮ
+    function toggleModal(show) {
+        document.getElementById('modal-wrap').style.display = show ? 'flex' : 'none';
+    }
+
+    // 3. ДОДАВАННЯ КВЕСТУ
+    async function submitQuest() {
+        const title = document.getElementById('in-title').value.trim();
+        const desc = document.getElementById('in-desc').value.trim();
+        const reward = document.getElementById('in-reward').value.trim();
+        const btn = document.querySelector('.btn-submit');
+
+        if (!title || !desc || !reward) {
+            alert("Заповніть усі поля форми!");return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "ОБРОБКА...";
+
+        // Додаємо візуально на сторінку
+        const container = document.getElementById('q-container');
+        const card = document.createElement('div');
+        card.className = 'quest-card';
+        card.innerHTML = `
+            <div class="author-info">
+                <img src="https://mc-heads.net/avatar/${myNick}/50" class="author-head">
+                <span class="author-name">${myNick}</span>
+            </div>
+            <div class="quest-main">
+                <h3>${title}</h3>
+                <p>${desc}</p>
+            </div>
+            <div class="reward-box">
+                <span class="reward-label">Нагорода</span>
+                <div class="reward-val">${reward}</div>
+            </div>
+        `;
+        
+        container.prepend(card);
+
+        // ВІДПРАВКА В DISCORD
+        const webhook = "ТУТ_ТВІЙ_WEBHOOK"; // ВСТАВ СВІЙ ЛІНК!
+
+        try {
+            await fetch(webhook, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "Whales Board",
+                    embeds: [{
+                        title: "🛠️ Нове замовлення: " + title,
+                        description: desc + "\n\n**Нагорода:** " + reward,
+                        color: 54103,
+                        footer: { text: "Замовник: " + myNick },
+                        thumbnail: { url: "https://mc-heads.net/avatar/" + myNick + "/100" }
+                    }]
+                })
+            });
+            alert("Замовлення успішно опубліковано на сайті та в Discord!");
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Очищення та закриття
+        document.getElementById('in-title').value = "";
+        document.getElementById('in-desc').value = "";
+        document.getElementById('in-reward').value = "";
+        btn.disabled = false;
+        btn.innerText = "ОПУБЛІКУВАТИ";
+        toggleModal(false);
+    }
+</script>
+
+</body>
+</html>

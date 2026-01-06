@@ -1,0 +1,179 @@
+Morivis, [05.01.26 17:31]
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whales SMP | Discord Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p: #5865F2; 
+            --accent: #00d2ff;
+            --bg: #030406;
+            --card: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.08);
+            --ts: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        body {
+            margin: 0; padding: 0; background: var(--bg); color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(88, 101, 242, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0, 210, 255, 0.08) 0%, transparent 50%);
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION --- */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            backdrop-filter: blur(30px); background: rgba(3, 4, 6, 0.75);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-container {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 80px; max-width: 1400px; margin: 0 auto; padding: 0 40px;
+        }
+
+        .tabs { display: flex; gap: 10px; }
+        .tab-link {
+            padding: 10px 20px; border-radius: 14px; color: #888;
+            font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: var(--ts);
+        }
+        .tab-link:hover { color: white; background: rgba(255,255,255,0.05); }
+        .tab-link.active { color: var(--p); background: rgba(88, 101, 242, 0.1); border: 1px solid rgba(88, 101, 242, 0.2); }
+
+        /* --- USER DROPDOWN SYSTEM --- */
+        .user-section { position: relative; }
+        .user-trigger {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.03); padding: 6px 14px;
+            border-radius: 16px; border: 1px solid var(--border);
+            cursor: pointer; transition: var(--ts);
+        }
+        .user-trigger:hover { border-color: var(--accent); background: rgba(0,210,255,0.05); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .dropdown {
+            position: absolute; top: 120%; right: 0; width: 220px;
+            background: #0a0c10; border: 1px solid var(--border);
+            border-radius: 20px; padding: 15px; display: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: dropIn 0.3s ease;
+        }
+        @keyframes dropIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .dropdown.show { display: block; }
+        .drop-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            color: #ccc; text-decoration: none; border-radius: 12px; transition: 0.2s;
+            font-size: 0.9rem; font-weight: 600;
+        }
+        .drop-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .drop-item.logout { color: #ff4444; margin-top: 10px; border-top: 1px solid var(--border); border-radius: 0 0 12px 12px; }
+
+        /* --- MAIN HERO --- */
+        .hero {
+            max-width: 1200px; margin: 60px auto; padding: 0 40px;
+            display: grid; grid-template-columns: 1fr 450px; gap: 60px; align-items: center;
+        }
+
+        .hero-text h1 { font-size: 4.5rem; letter-spacing: -3px; margin: 0; line-height: 1; }
+        .hero-text span { color: var(--p); }
+
+        .discord-card {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 40px; border-radius: 40px; backdrop-filter: blur(20px);
+            text-align: center; box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+        }
+
+        .btn-join {
+
+
+display: block; background: var(--p); color: white;
+            padding: 20px; border-radius: 20px; text-decoration: none;
+            font-weight: 800; font-size: 1.1rem; transition: var(--ts);
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4);
+            margin-top: 30px;
+        }
+        .btn-join:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(88, 101, 242, 0.6); }
+
+        .widget-wrapper {
+            border-radius: 30px; overflow: hidden; border: 1px solid var(--border);
+            height: 500px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div style="font-weight: 800; font-size: 1.2rem;">WHALES<span>.</span></div>
+            <nav class="tabs">
+                <a href="index.html" class="tab-link">Головна</a>
+                <a href="wiki.html" class="tab-link">Вікі</a>
+                <a href="shop.html" class="tab-link">Магазин</a>
+                <a href="discord.html" class="tab-link active">Discord</a>
+            </nav>
+            
+            <div class="user-section">
+                <div class="user-trigger" onclick="toggleDrop()">
+                    <img id="u-head" src="" class="user-avatar">
+                    <span id="u-nick" style="font-weight: 700; font-size: 0.9rem;">...</span>
+                </div>
+                <div class="dropdown" id="userDrop">
+                    <a href="profile.html" class="drop-item">👤 Мій профіль</a>
+                    <a href="settings.html" class="drop-item">⚙️ Налаштування</a>
+                    <a href="#" onclick="logout()" class="drop-item logout">🚪 Вийти з системи</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="hero-text">
+            <p style="color: var(--p); font-weight: 800; letter-spacing: 2px;">COMMUNITY HUB</p>
+            <h1>Тут б'ється серце <span>Whales.</span></h1>
+            <p style="color: #666; font-size: 1.2rem; margin: 25px 0 40px;">Наш Discord — це не просто чат. Це івенти, правосуддя та твоя можливість впливати на розвиток SMP.</p>
+            
+            <div class="discord-card">
+                <img src="https://www.logo.wine/a/logo/Discord_(software)/Discord_(software)-Logo.wine.svg" style="width: 150px; margin-bottom: -20px;">
+                <h2>Ти з нами?</h2>
+                <a href="https://discord.gg/ТВОЄ_ПОСИЛАННЯ" target="_blank" class="btn-join">ПРИЄДНАТИСЯ</a>
+            </div>
+        </div>
+
+        <div class="widget-wrapper">
+            <iframe src="https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Ініціалізація даних
+        document.addEventListener('DOMContentLoaded', () => {
+            const nick = localStorage.getItem('playerNick') || "Steve";
+            document.getElementById('u-nick').innerText = nick;
+            document.getElementById('u-head').src = "https://mc-heads.net/avatar/${nick}/32";
+        });
+
+        // Управління меню
+        function toggleDrop() {
+            document.getElementById('userDrop').classList.toggle('show');
+        }
+
+        // Закриття меню при кліку в іншому місці
+        window.onclick = function(event) {
+            if (!event.target.closest('.user-section')) {
+                document.getElementById('userDrop').classList.remove('show');
+            }
+        }
+
+        function logout() {
+            if(confirm("Вийти з акаунту?")) {
+                localStorage.clear();
+                window.location.href = "activate.html";
+            }
+        }
+    </script>
+</body>
+</html>

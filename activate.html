@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whales SMP | Secure Entry</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p: #00d2ff;
+            --p-glow: rgba(0, 210, 255, 0.3);
+            --bg: #030406;
+            --error: #ff4466;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: var(--bg); color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 210, 255, 0.05) 0%, transparent 40%);
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- АНІМОВАНИЙ ФОН --- */
+        .blobs { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: -1; filter: blur(80px); }
+        .blob { position: absolute; background: var(--p); border-radius: 50%; opacity: 0.1; animation: move 20s infinite alternate; }
+
+        @keyframes move { from { transform: translate(0, 0); } to { transform: translate(100px, 100px); } }
+
+        /* --- КАРТКА ВХОДУ --- */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px; padding: 45px;
+            width: 90%; max-width: 380px;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .logo { font-weight: 800; font-size: 1.8rem; letter-spacing: -1.5px; margin-bottom: 10px; }
+        .logo span { color: var(--p); text-shadow: 0 0 15px var(--p-glow); }
+
+        .subtitle { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 35px; }
+
+        .input-box { position: relative; margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 0.7rem; color: var(--p); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-weight: 800; opacity: 0.8; }
+
+        input {
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px; border-radius: 14px; color: white; font-family: inherit;
+            box-sizing: border-box; outline: none; transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        input:focus { 
+            border-color: var(--p); background: rgba(255,255,255,0.06);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+        }
+
+        .btn-login {
+            width: 100%; background: var(--p); color: #000; border: none;
+            padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer;
+            text-transform: uppercase; font-size: 0.85rem; margin-top: 15px;
+            transition: all 0.3s; box-shadow: 0 10px 20px -5px var(--p-glow);
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px var(--p-glow); filter: brightness(1.1); }
+        .btn-login:active { transform: translateY(0); }
+
+        #error-msg { 
+            background: rgba(255, 68, 102, 0.1); color: var(--error); 
+            padding: 10px; border-radius: 10px; font-size: 0.8rem; 
+            margin-top: 20px; display: none; border: 1px solid rgba(255, 68, 102, 0.2);
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="blobs">
+    <div class="blob" style="width: 400px; height: 400px; left: -100px; top: -100px;"></div>
+    <div class="blob" style="width: 300px; height: 300px; right: -50px; bottom: -50px; animation-delay: -5s;"></div>
+</div>
+
+<div class="auth-card" id="card">
+    <div class="logo">WHALES<span>.</span>SMP</div>
+    <div class="subtitle">PROTOCOL: ENCRYPTED_ACCESS_v2</div>
+
+    <div class="input-box">
+        <label>Ідентифікатор</label>
+        <input type="text" id="user-nick" placeholder="Введіть нікнейм..." spellcheck="false">
+    </div>
+
+    <div class="input-box">
+        <label>Ключ доступу</label>
+        <input type="password" id="user-pass" placeholder="Введіть пароль...">
+    </div>
+
+    <button class="btn-login" onclick="handleAuth()">Авторизувати вузол</button>
+    
+    <div id="error-msg">⚠️ Помилка: Ключ не збігається</div>
+</div>
+
+<script>
+    // БАЗА ДАНИХ
+    const SECURE_DB = [
+        { nick: "Alberr0", hash: "79c12580345cf79732934c9e92da28473129c65de92c480350026691212599a1" }, 
+        { nick: "Damortivna", hash: "b272edf3d8066ea76aa74c1c6e610e1de168663b44a6a19ab691f54a00e7100e" },  
+        { nick: "Morivis", hash: "acf2dce429806433beaae4fab1c6f34efc824136de36b9b699200c5f9137767d" }, 
+        { nick: "JahJahowych", hash: "a67089356cf16df1393a20abf9f9807909cb473e85bc5b4b3ced1a7c27a2bd23" },
+        { nick: "Tasara", hash: "3a8dcfd7cc1e98656bf247426319481cc95fe1f3dba609d1ce58cd8defa90ad9" },
+        { nick: "510", hash: "967beeae392c42f348edcd05339f8334621e21d89a58dbe6f59223b2f67e81ee" }, 
+        { nick: "YARRR090", hash: "48252ec0f8f352e3c5276a86edaf45ec60cf96b9fd27465a8923aef6197740ea" },
+        { nick: "YanniDra", hash: "18c85ecc69af05a28fcf5ed91a20a62f1af06e818ef28d9de69d10b97649cabd" },
+        { nick: "Zoro_ice", hash: "2284c45459d29f20838d91ff14ed7c3b18038292dc623f23f7c2ad27f5301f05" },
+        { nick: "Tradwdal", hash: "ca0f519d2f426f3544d085f65061bf130a2c23aae6c1926aa3126359c2ec4592" },
+        { nick: "Hotlion", hash: "de3244cd856cc9cc93cac3be3e5842bce5f4cb3c0d89c171571bef8239ac4595" },
+        { nick: "Vormotiks", hash: "60c68e2b050c3f72192b29934b5db66904551d6882232f30511f73c5e96b7088" },
+        { nick: "Sovisti", hash: "c4b48f87b3dcc4d2b1e30d3b0d79490a375810f7a869c7301e8200259831c50a" },
+        { nick: "Terbundo", hash: "b3e59c09ca2b7003b20f32112d09dfc9a98ed4e60bc381f1e54864898b4ae047" },
+        { nick: "Schweppes", hash: "549a45fbd1e61080f4417e92e8bdc3583c609b15bcbd1db572833e727926417c" },
+        { nick: "Mr_yayku", hash: "fd12bc23152c055c6446f543d1be8c11b37ae345157c45635d2629204cc1aaf5" },
+        { nick: "IceExplode", hash: "324939e17d0c7532e2ded5962bb740caed6f7614dfcd362a1aceb5b0b1ac40f4" },
+        { nick: "Human200", hash: "1bf272fde7ce6f9d6c3e2f9083b8f43a7a3b92dc9224666eb8557d4d9af4036a" },
+        { nick: "GlavniyGeroy", hash: "ec9f5947369383b26aeb0749c2d977eb1880a774d14cc909ec14683ed1b93c4d" },
+        { nick: "Fima", hash: "9e2500e7966925d1b3055149ebf83ba377ebdac332de91a10a04c1a17c720bce" },
+        { nick: "Antrew_567", hash: "faa22c3d42aa8c9342080f5236500f0d31408444f0871fb316cac5e4d2471eba" },
+        { nick: "Chipmunk", hash: "acf2dce429806433beaae4fab1c6f34efc824136de36b9b699200c5f9137767d" },
+    ];
+
+    function handleAuth() {
+        const nickNode = document.getElementById('user-nick');
+        const passNode = document.getElementById('user-pass');
+        const error = document.getElementById('error-msg');
+        const card = document.getElementById('card');
+
+        const nick = nickNode.value.trim();
+        const pass = passNode.value.trim();
+
+        if(!nick || !pass) {
+            showError("Заповніть усі поля");
+            return;
+        }
+
+        // Хешування
+        const inputHash = CryptoJS.SHA256(pass).toString();
+        const user = SECURE_DB.find(u => u.nick.toLowerCase() === nick.toLowerCase());
+
+        if (user && user.hash === inputHash) {
+            // Успішний вхід
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                localStorage.setItem('playerNick', user.nick);
+                window.location.href = "index.html";
+            }, 300);
+        } else {
+            // Помилка
+            showError("Невірний нікнейм або пароль");
+            card.style.animation = 'shake 0.4s';
+            setTimeout(() => card.style.animation = '', 400);
+        }
+    }
+
+    function showError(text) {
+        const error = document.getElementById('error-msg');
+        error.innerText = "⚠️ " + text;
+        error.style.display = 'block';
+    }
+
+    // Вхід через Enter
+    document.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAuth(); });
+</script>
+
+</body>
+</html>

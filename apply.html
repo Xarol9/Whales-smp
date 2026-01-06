@@ -2,79 +2,96 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подати заявку | Whales SMP</title>
-    <style>
-        body { background: #0f111a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .form-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #00d2ff; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #aaa; }
-        input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #1a1d29; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #5865F2; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        button:hover { background: #4752c4; }
-        .back { display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none; font-size: 0.8rem; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="form-card">
-    <h2>Заявка на Whitelist</h2>
-    <form id="whitelistForm">
-        <div class="input-group">
-            <label>Твій ігровий нік (Minecraft)</label>
-            <input type="text" id="mc_nick" required placeholder="Напр. morivis">
-        </div>
-        <div class="input-group">
-            <label>Твій вік</label>
-            <input type="number" id="age" required>
-        </div>
-        <div class="input-group">
-            <label>Чому хочеш грати у нас?</label>
-            <textarea id="reason" rows="3" required placeholder="Розкажи трохи про себе"></textarea>
-        </div>
-        <button type="submit" id="submitBtn">Надіслати заявку</button>
-    </form>
-    <a href="index.html" class="back">← Повернутися на головну</a>
+<header class="header">
+    <div class="header-container">
+        <a href="index.html" class="logo">🐋 Whales<span>SMP</span></a>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-btn">Головна</a>
+            <a href="players.html" class="nav-btn">Гравці</a>
+            <a href="apply.html" class="nav-btn active">Заявка</a>
+            <a href="activate.html" class="btn-primary">🔑 Вхід</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <div class="card">
+        <h2 class="text-gradient">Анкета тестера</h2>
+        <p style="color: #888; margin-bottom: 30px;">Заповни форму, і ми розглянемо твою кандидатуру протягом 24 годин.</p>
+        
+        <form id="applyForm">
+            <div style="margin-bottom: 20px;">
+                <label>Твій Нікнейм</label>
+                <input type="text" id="appNick" class="nav-btn" style="width: 100%; background: #000;" required>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label>Твій Discord (Username)</label>
+                <input type="text" id="appDiscord" class="nav-btn" style="width: 100%; background: #000;" placeholder="nazar#1234" required>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label>Чому ти хочеш до нас?</label>
+                <textarea id="appReason" class="nav-btn" style="width: 100%; background: #000; height: 100px; resize: none;" required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer;">🚀 Надіслати заявку</button>
+        </form>
+        <p id="formStatus" style="margin-top: 15px; text-align: center; font-weight: bold;"></p>
+    </div>
 </div>
 
-<script>
-document.getElementById('whitelistForm').onsubmit = function(e) {
-    e.preventDefault();
-    
-    const btn = document.getElementById('submitBtn');
-    const webhookURL = "https://discordapp.com/api/webhooks/1457072249428508916/Z_v_nZfkrqKcO5_5zWXdnV3HtMz4xb8fprz_vY2TxDSvx1GSOwSogzW2_tsKE15kQPaq"; // ВСТАВ СВІЙ URL ТУТ!
 
-    const data = {
-        embeds: [{
-            title: "📩 Нова заявка на Whitelist!",
-            color: 5814783,
-            fields: [
-                { name: "Нік у грі", value: document.getElementById('mc_nick').value, inline: true },
-                { name: "Вік", value: document.getElementById('age').value, inline: true },
-                { name: "Причина", value: document.getElementById('reason').value }
-            ],
-            footer: { text: "Whales SMP Web Portal" },
-            timestamp: new Date()
-        }]
+
+<script>
+    // Автозаповнення ніка, якщо є в пам'яті
+    window.onload = () => {
+        const savedNick = localStorage.getItem('playerNick');
+        if (savedNick) document.getElementById('appNick').value = savedNick;
     };
 
-    btn.innerText = "Надсилаємо...";
-    btn.disabled = true;
+    document.getElementById('applyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nick = document.getElementById('appNick').value;
+        const discord = document.getElementById('appDiscord').value;
+        const reason = document.getElementById('appReason').value;
+        const status = document.getElementById('formStatus');
 
-    fetch(webhookURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then(() => {
-        alert("Заявку успішно надіслано! Чекай на відповідь у Discord.");
-        window.location.href = 'index.html';
-    }).catch(() => {
-        alert("Помилка при надсиланні.");
-        btn.disabled = false;
-        btn.innerText = "Надіслати заявку";
+        // ТУТ МАЄ БУТИ ТВІЙ WEBHOOK URL З DISCORD
+        const webhookURL = "ТУТ_ТВІЙ_WEBHOOK_URL"; 
+
+        const data = {
+            embeds: [{
+                title: "🆕 Нова заявка на Whales SMP",
+                color: 5814783, // Блакитний колір
+                fields: [
+                    { name: "Нікнейм", value: nick, inline: true },
+                    { name: "Discord", value: discord, inline: true },
+                    { name: "Причина", value: reason }
+                ],
+                timestamp: new Date()
+            }]
+        };
+
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(() => {
+            status.innerText = "✅ Заявку надіслано! Чекай відповіді в Discord.";
+            status.style.color = "#2ed573";
+            document.getElementById('applyForm').reset();
+        }).catch(() => {
+            status.innerText = "❌ Помилка. Спробуй пізніше.";
+            status.style.color = "#ff4757";
+        });
     });
-};
 </script>
 
 </body>

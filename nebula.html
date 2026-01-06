@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHALES.OS // ULTIMATE_CORE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@100;400;800&display=swap" rel="stylesheet">
+    <style>
+        /* === 1. БАЗОВА АРХІТЕКТУРА (Гнучка та стабільна) === */
+        :root {
+            --neon: #00f2ff; --blood: #ff0055; --toxic: #0dff72; --violet: #bc00ff;
+            --gold: #ffcc00; --bg: #000105; --glass: rgba(0, 10, 15, 0.95);
+            --border: rgba(0, 242, 255, 0.15); --font: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--bg); color: #fff; font-family: var(--font); 
+            height: 100vh; width: 100vw; overflow: hidden; display: flex;
+        }
+
+        /* Фоновий шар */
+        #bg-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+        /* ГОЛОВНИЙ КОНТЕЙНЕР (Три колони, які ніколи не перетинаються) */
+        #os-root {
+            display: flex; width: 100%; height: 100%; padding: 15px; gap: 15px;
+            transition: 0.5s ease-out;
+        }
+
+        .panel {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 15px; display: flex; flex-direction: column;
+            overflow: hidden; backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        /* ЛІВА ПАНЕЛЬ: НАВІГАЦІЯ */
+        .col-left { width: 85px; flex-shrink: 0; justify-content: center; align-items: center; gap: 20px; }
+        .nav-item {
+            width: 55px; height: 55px; border-radius: 12px; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            color: var(--neon); cursor: pointer; transition: 0.3s;
+        }
+        .nav-item:hover, .nav-item.active { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
+
+        /* ЦЕНТРАЛЬНА ПАНЕЛЬ: РОБОЧА ЗОНА */
+        .col-main { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+        header { height: 80px; flex-direction: row !important; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; }
+        
+        .viewport { flex: 1; padding: 30px; overflow-y: auto; }
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.4s ease; }
+
+        /* ПРАВА ПАНЕЛЬ: ТЕРМІНАЛ ТА HUD */
+        .col-right { width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
+        .terminal { flex: 1; padding: 20px; border-color: var(--toxic); background: rgba(0,10,5,0.8); }
+        #term-log { height: calc(100% - 40px); overflow-y: auto; font-size: 0.8rem; color: var(--toxic); }
+        .term-input { display: flex; gap: 10px; border-top: 1px solid rgba(13,255,114,0.1); padding-top: 10px; }
+        
+        /* СЕКРЕТНІ ПОВІДОМЛЕННЯ (ДОВГІ) */
+        .secret-box {
+            background: rgba(188, 0, 255, 0.05); border: 1px solid rgba(188, 0, 255, 0.2);
+            padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid var(--violet);
+        }
+        .secret-box h3 { color: var(--violet); font-family: 'Orbitron'; margin-bottom: 10px; font-size: 1rem; }
+        .secret-box p { font-size: 0.9rem; line-height: 1.8; color: #ccc; text-align: justify; }
+
+        /* КНОПКА EXIT */
+        .exit-btn {
+            background: rgba(255,0,85,0.1); border: 1px solid var(--blood); color: var(--blood);
+            padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; cursor: pointer;
+        }
+        .exit-btn:hover { background: var(--blood); color: #fff; box-shadow: 0 0 30px var(--blood); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-family: inherit; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-layer"></canvas>
+
+    <div id="os-root">
+        
+        <div class="panel col-left">
+            <div class="nav-item active" onclick="switchTab('dash', this)">🏠</div>
+            <div class="nav-item" onclick="switchTab('vault', this)">🔒</div>
+            <div class="nav-item" onclick="switchTab('forge', this)">⚒️</div>
+        </div>
+
+        <div class="col-main">
+            <header class="panel">
+                <h1 style="font-family:'Orbitron'; letter-spacing:10px; color:var(--neon);">WHALES.OS_X</h1>
+                <div style="display:flex; align-items:center; gap:30px;">
+                    <div id="clock" style="font-family:'Orbitron'; color:var(--gold); font-size:1.5rem;">00:00:00</div>
+                    <button class="exit-btn" onclick="systemExit()">SHUTDOWN</button>
+                </div>
+            </header>
+
+            <main class="panel viewport">
+                <div id="dash" class="view active">
+                    <h2 style="font-family:'Orbitron'; margin-bottom:20px;">SYSTEM_STATUS</h2>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="panel" style="padding:20px; border-color:var(--neon);">
+                            <small>CPU_LOAD</small> <h2 id="cpu-val">0%</h2>
+                        </div>
+                        <div class="panel" style="padding:20px; border-color:var(--toxic);">
+                            <small>NETWORK</small> <h2>STABLE</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vault" class="view">
+                    <h2 style="font-family:'Orbitron'; color:var(--violet); margin-bottom:25px;">THE_VAULT_DEEP_DATA</h2>
+                    <div id="vault-list">
+                        </div>
+                </div>
+
+                <div id="forge" class="view">
+                    <div style="text-align:center;">
+                        <img id="item-img" src="https://minecraft.wiki/images/Netherite_Sword_JE2_BE2.png" style="width:250px; filter:drop-shadow(0 0 30px var(--neon)); transition:0.5s;">
+                        <div style="margin-top:40px; display:flex; justify-content:center; gap:20px;">
+                            <button class="exit-btn" style="border-color:var(--neon); color:var(--neon);" onclick="modItem('neon')">NEON</button>
+                            <button class="exit-btn" style="border-color:var(--blood); color:var(--blood);" onclick="modItem('blood')">BLOOD</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="col-right">
+            <div class="panel terminal">
+                <div id="term-log"></div>
+                <div class="term-input">
+                    <span style="color:var(--toxic);">admin@os:~$</span>
+                    <input type="text" id="cmd-input" placeholder="Type..." autocomplete="off">
+                </div>
+            </div>
+            <div class="panel" style="height:200px; padding:20px;">
+                <h4 style="font-size:0.7rem; color:var(--gold); margin-bottom:10px;">SYSTEM_LOGS</h4>
+                <div id="sys-feed" style="font-size:0.6rem; color:rgba(255,255,255,0.3); line-height:1.8;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* === 2. ДАНІ ТА ЛОГІКА (Максимальна безпека) === */
+
+        const SECRETS = [
+            {
+                title: "PROJECT_SINGULARITY_REPORT",
+                text: "Звіт по проекту 'Сингулярність': Ми успішно інтегрували нейронний драйвер v18 в ядро Whales.OS. Система почала демонструвати непередбачувані патерни в Секторі 7. Швидкість обробки даних зросла до 15.4 терафлопс, що перевищує наші очікування на 300%. Протокол безпеки змінено. Пароль адміністратора для критичних помилок: WHALE_GOD_777. У разі виявлення аномальних стрибків напруги негайно відключіть Сектор 4."
+            },
+            {
+                title: "ENCRYPTED_LOCATION_DATA",
+                text: "Об'єкт: Центральний серверний вузол. Координати: 64.1265° N, 21.8174° W. Розташування: Глибоководний бункер під ісландським шельфом. Вхід замасковано під сейсмічну дослідницьку станцію. Доступ дозволено лише персоналу з біометричними мітками класу 'A'. Будь-яка спроба несанкціонованого підключення до мережі викликає автоматичну дезінтеграцію даних на локальних терміналах."
+            },
+            {
+                title: "INTERNAL_MEMO_#2026",
+                text: "Нотатка для розробників: Ми оновили інтерфейс до Enterprise-рівня. Головна перевага цієї версії — абсолютна стабільність Flex-колонок. Навіть при великих обсягах тексту в Сейфі (The Vault), бокові панелі залишаються заблокованими. Це усуває проблему 'наповзання' блоків, яка виникала раніше. Термінал тепер працює незалежно від візуальних вкладок. Користуйтеся комфортно."
+            }
+        ];
+
+        // Ініціалізація вкладок
+        function switchTab(id, el) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            if(id === 'vault') renderVault();
+            addLog("Switched to: " + id);
+        }
+
+        // Рендеринг довгих текстів
+        function renderVault() {
+            const list = document.getElementById('vault-list');
+            list.innerHTML = '';
+            SECRETS.forEach(s => {
+                list.innerHTML += `
+                    <div class="secret-box">
+                        <h3>${s.title}</h3>
+                        <p>${s.text}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Термінал
+        const cmdIn = document.getElementById('cmd-input');
+        const termLog = document.getElementById('term-log');
+
+        cmdIn.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') {
+                const cmd = cmdIn.value.toLowerCase().trim();
+                termLog.innerHTML += `<div><span style="color:var(--neon)">></span> ${cmd}</div>`;
+                let res = "Unknown command. Try: help, scan, clear.";
+                if(cmd === 'help') res = "Commands: scan, clear, status, vault";
+                if(cmd === 'scan') res = "Scanning core... 100% Secure. Integrity: Optimal.";
+                if(cmd === 'clear') { termLog.innerHTML = ''; cmdIn.value = ''; return; }
+                
+                termLog.innerHTML += `<div style="opacity:0.5; margin-bottom:10px;">${res}</div>`;
+                cmdIn.value = '';
+                termLog.scrollTop = termLog.scrollHeight;
+                addLog("CMD: " + cmd);
+            }
+        });
+
+        // Системні логи
+        function addLog(msg) {
+            const feed = document.getElementById('sys-feed');
+            const time = new Date().toLocaleTimeString();
+            feed.innerHTML = `<div>[${time}] ${msg}</div>` + feed.innerHTML;
+        }
+
+        // Анімація виходу
+        function systemExit() {
+            document.getElementById('os-root').style.transform = "scale(0) rotate(20deg)";
+            document.getElementById('os-root').style.opacity = "0";
+            setTimeout(() => { window.location.href = "index.html"; }, 800);
+        }
+
+        // Модифікація меча
+        function modItem(type) {
+            const img = document.getElementById('item-img');
+            img.style.filter = type === 'neon' 
+                ? "drop-shadow(0 0 40px var(--neon)) brightness(1.2)" 
+                : "drop-shadow(0 0 40px var(--blood)) hue-rotate(320deg)";
+        }
+
+        // Час та Статистика
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+            document.getElementById('cpu-val').innerText = Math.floor(Math.random() * 10 + 5) + "%";
+        }, 1000);
+
+        // Фоновий ефект (Canvas)
+        const canvas = document.getElementById('bg-layer');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        
+        function drawParticles() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(0, 242, 255, 0.1)";
+            for(let i=0; i<50; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 1, 0, Math.PI*2);
+                ctx.fill();
+            }
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+
+        window.onload = () => addLog("System Kernel Online. Welcome.");
+    </script>
+</body>
+</html>

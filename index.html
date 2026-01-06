@@ -1,159 +1,225 @@
-Morivis, [03.01.26 19:25]
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whales SMP | Головна</title>
+    <title>Whales SMP | Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --p: #00d2ff;
+            --bg: #030406;
+            --card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --ts: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Сторінка прихована за замовчуванням для безпеки */
         body {
-            background-color: #0f111a;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
+            margin: 0; padding: 0;
+            background: var(--bg); color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: radial-gradient(circle at 50% -20%, #1a2a3a 0%, #030406 100%);
+            min-height: 100vh; overflow-x: hidden;
+            display: none; 
         }
 
-        .container {
-            max-width: 800px;
-            padding: 40px;
+        /* --- ВЕРХНЯ НАВІГАЦІЯ --- */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(3, 4, 6, 0.8);
+            border-bottom: 1px solid var(--border);
         }
 
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            background-clip: text; /* Додано для сумісності як на скриншоті 17 */
-            -webkit-text-fill-color: transparent;
+        .nav-container {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 70px; max-width: 1400px; margin: 0 auto; padding: 0 30px;
         }
 
-        .status {
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; text-transform: uppercase; }
+        .logo span { color: var(--p); }
+
+        .tabs { display: flex; gap: 5px; }
+        .tab-link {
+            padding: 8px 16px; border-radius: 10px;
+            color: #aaa; font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; transition: var(--ts);
+        }
+        .tab-link:hover, .tab-link.active { color: white; background: rgba(255,255,255,0.05); }
+        .tab-link.active { color: var(--p); border: 1px solid rgba(0, 210, 255, 0.2); }
+
+        /* --- ГРИД КОНТЕНТУ --- */
+        .layout {
+            display: grid; grid-template-columns: 1fr 300px;
+            max-width: 1400px; margin: 30px auto; padding: 0 30px; gap: 30px;
         }
 
-        /* Стиль кнопки входу */
-        .btn-discord {
-            background-color: #5865F2;
-            color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: 0.3s;
-            display: inline-block;
+        .card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 24px; padding: 30px; backdrop-filter: blur(10px);
+            margin-bottom: 25px;
         }
 
-        .btn-discord:hover {
-            background-color: #4752c4;
-            transform: translateY(-2px);
+        /* --- СИСТЕМА ДРУЗІВ --- */
+        .sidebar-title {
+            font-size: 0.7rem; font-weight: 800; color: #555;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;
+            display: flex; justify-content: space-between;
         }
 
-        /* Стиль плашки профілю, коли ти вже увійшов */
-        .user-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: 0.3s;
+        .friend-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px;
+            border-radius: 14px; transition: 0.3s; cursor: pointer;
+        }
+        .friend-item:hover { background: rgba(255,255,255,0.03); }
+        .friend-head { width: 32px; height: 32px; border-radius: 6px; }
+        .friend-info b { font-size: 0.85rem; display: block; }
+        .friend-info span { font-size: 0.7rem; color: #00ff88; opacity: 0.8; }
+
+        .add-friend-input {
+            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+            padding: 12px; border-radius: 12px; color: white; font-family: inherit;
+            margin-bottom: 10px; box-sizing: border-box;
         }
 
-        .user-pill:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .btn-p {
+            width: 100%; background: var(--p); color: black; border: none;
+            padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;
+            text-transform: uppercase; font-size: 0.75rem;
         }
 
-        .user-pill img {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #5865F2;
-        }
+        /* --- USER SECTION --- */
+        .user-meta { display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; }
+        .user-meta img { width: 32px; border-radius: 8px; border: 1px solid var(--p); }
 
-        .user-pill span {
-            font-weight: bold;
-            font-size: 1.1rem;
+        .logout-btn {
+            background: none; border: 1px solid #ff4444; color: #ff4444;
+            padding: 5px 10px; border-radius: 8px; font-size: 0.6rem;
+            cursor: pointer; margin-left: 10px; transition: 0.3s;
         }
-
-        nav {
-            margin-top: 40px;
-            display: flex;
-            gap: 20px;
-        }
-
-        nav a {
-            color: #888;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        nav a:hover { color: white; }
+        .logout-btn:hover { background: #ff4444; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Whales SMP</h1>
-        <p class="status">Приватний Minecraft сервер для друзів</p>
-
-        <div id="auth-section">
-            <a href="https://discord.com/oauth2/authorize?client_id=1457041207992516611&response_type=code&redirect_uri=https%3A%2F%2Fxarol9.github.io%2FWhales-smp%2Fprofile.html&scope=identify" class="btn-discord">
-                Увійти через Discord
+<header>
+    <div class="nav-container">
+        <div class="logo">WHALES<span>.</span></div>
+        <nav class="tabs">
+            <a href="nebula.html" class="tab-link">PROJECT: NEURAL BLUEPRINT</a>
+            <a href="index.html" class="tab-link active">Головна</a>
+            <a href="news.html" class="tab-link">Новини</a>
+            <a href="wiki.html" class="tab-link">Вікі</a>
+            <a href="quests.html" class="tab-link">Квести</a>
+            <a href="shop.html" class="tab-link">Магазин</a>
+            <a href="discord.html" class="tab-link">Discord</a>
+        </nav>
+        <div style="display: flex; align-items: center;">
+            <a href="profile.html" class="user-meta">
+                <span id="u-name" style="font-size: 0.85rem; font-weight: 600;">Гравець</span>
+                <img id="u-head" src="https://mc-heads.net/avatar/steve/32" alt="">
             </a>
+            <button class="logout-btn" onclick="logout()">Вийти</button>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+    <main>
+        <div class="card" style="background: linear-gradient(to right, rgba(0,210,255,0.05), transparent);">
+            <h1 style="margin:0; font-size: 2.5rem; letter-spacing: -1.5px;">Вітаємо, <span id="welcome-nick">Гравець</span>!</h1>
+            <p style="color: #777; margin-top: 10px;">Твій особистий кабінет Whales SMP готовий до роботи.</p>
         </div>
 
-        <nav>
-            <a href="wiki.html">Вікіпедія</a>
-            <a href="players.html">Гравці</a>
-            <a href="apply.html" style="color: #00d2ff; font-weight: bold;">Подати заявку</a>
-        </nav>
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">📢 Події на сервері</h3>
+            <p style="line-height: 1.6; color: #ccc;">Слідкуйте за новинами у вкладці "Новини" та не забувайте заглядати в "Квести", щоб отримувати нагороди.</p>
+        </div>
+    </main>
 
-    <script>
-        function checkLogin() {
-            const token = localStorage.getItem('discord_token');
-            const authSection = document.getElementById('auth-section');
+    <aside>
+        <div class="card" style="padding: 20px;">
+            <div class="sidebar-title">Друзі <span>(0)</span></div>
+            <input type="text" id="f-input" class="add-friend-input" placeholder="Нікнейм друга">
+            <button class="btn-p" onclick="addFriend()">Додати в друзі</button>
 
-            if (token) {
-                // Завантажуємо дані користувача
-                fetch('https://discord.com/api/users/@me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Expired');
-                    return res.json();
-                })
-                .then(data => {
-                    // Якщо все ок, показуємо аватарку і нік як на скриншоті 16
-                    authSection.innerHTML = `
-                        <div class="user-pill" onclick="location.href='profile.html'">
-                            <img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png" alt="Avatar">
-                            <span>${data.username}</span>
+            <div id="friends-box" style="margin-top: 20px;"></div>
+        </div>
 
-Morivis, [03.01.26 19:25]
+        <div class="card" style="padding: 20px; text-align: center;">
+            <p style="font-size: 0.7rem; color: #555; text-transform: uppercase;">Система безпеки</p>
+            <span style="color: #00ff88; font-size: 0.8rem;">● SHA-256 Захист</span>
+        </div>
+    </aside>
 </div>
-                    `;
-                })
-                .catch(() => {
-                    // Якщо токен старий - нічого не міняємо (залишається кнопка входу)
-                    localStorage.removeItem('discord_token');
-                });
-            }
-        }
 
-        // Запуск перевірки
-        checkLogin();
-    </script>
+<script>
+// --- КРИТИЧНИЙ СКРИПТ ПЕРЕВІРКИ ---
+(function checkAuth() {
+    const nick = localStorage.getItem('playerNick');
+    if (!nick) {
+        // Якщо ніка немає — миттєвий редирект на активацію
+        window.location.replace("activate.html");
+    } else {
+        // Якщо нік є — показуємо сторінку
+        document.body.style.display = 'block';
+    }
+})();
+
+// Ініціалізація даних
+document.addEventListener('DOMContentLoaded', () => {
+    const nick = localStorage.getItem('playerNick');
+    if (nick) {
+        document.getElementById('u-name').innerText = nick;
+        document.getElementById('welcome-nick').innerText = nick;
+        document.getElementById('u-head').src = `https://mc-heads.net/avatar/${nick}/32`;
+        renderFriends();
+    }
+});
+
+// СИСТЕМА ДРУЗІВ
+let friends = JSON.parse(localStorage.getItem('whales_friends')) || [];
+
+function renderFriends() {
+    const box = document.getElementById('friends-box');
+    const titleCount = document.querySelector('.sidebar-title span');
+    
+    if (titleCount) titleCount.innerText = `(${friends.length})`;
+
+    if (friends.length === 0) {
+        box.innerHTML = '<p style="font-size:0.75rem; color:#444; text-align:center;">Список порожній</p>';
+        return;
+    }
+
+    box.innerHTML = friends.map(f => `
+        <div class="friend-item">
+            <img src="https://mc-heads.net/avatar/${f}/32" class="friend-head">
+            <div class="friend-info">
+                <b>${f}</b>
+                <span>онлайн</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addFriend() {
+    const inp = document.getElementById('f-input');
+    const name = inp.value.trim();
+    if (name && !friends.includes(name)) {
+        friends.push(name);
+        localStorage.setItem('whales_friends', JSON.stringify(friends));
+        inp.value = '';
+        renderFriends();
+    }
+}
+
+// Функція виходу
+function logout() {
+    localStorage.removeItem('playerNick');
+    window.location.replace("activate.html");
+}
+</script>
 </body>
 </html>

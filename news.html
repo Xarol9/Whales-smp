@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHALES HUB | СИСТЕМА СИНХРОНІЗАЦІЇ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --danger: #ff2a6d;
+            --update: #f1c40f;
+            --success: #00ff88;
+            --bg: #05050a;
+            --panel: rgba(15, 15, 25, 0.9);
+            --border: rgba(0, 242, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { 
+            background: var(--bg); color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% -20%, #1a1a35 0%, var(--bg) 100%);
+        }
+
+        /* HEADER */
+        header {
+            height: 70px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); display: flex;
+            justify-content: space-between; align-items: center; padding: 0 30px; z-index: 1000;
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 10px 20px; border-radius: 12px; text-decoration: none;
+            font-size: 0.75rem; font-weight: 700; cursor: pointer;
+        }
+        .btn-nav:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+
+        /* LAYOUT */
+        .wrapper { display: grid; grid-template-columns: 280px 1fr 300px; height: calc(100vh - 70px); padding: 20px; gap: 20px; }
+
+        .sidebar { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; }
+
+        .feed-container { overflow-y: auto; padding-right: 15px; scroll-behavior: smooth; }
+        .feed-container::-webkit-scrollbar { width: 5px; }
+        .feed-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .feed-container::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* SEARCH BAR */
+        .search-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            padding: 12px 15px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .search-box input {
+            background: none; border: none; color: #fff; width: 100%; outline: none; font-size: 0.85rem;
+        }
+
+        /* NAV ITEMS */
+        .nav-item {
+            padding: 14px 18px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
+            font-weight: 700; color: #555; display: flex; align-items: center; gap: 15px;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: #999; }
+        .nav-item.active { 
+            background: linear-gradient(90deg, rgba(0, 242, 255, 0.08) 0%, transparent 100%);
+            color: var(--primary); border-left: 4px solid var(--primary); border-color: var(--border);
+        }
+        .nav-item span { font-size: 1.2rem; filter: drop-shadow(0 0 8px var(--primary)); }
+
+        /* CARDS */
+        .card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px; padding: 30px; margin-bottom: 20px; animation: slideUp 0.5s ease forwards;
+        }
+        .card:hover { border-color: var(--primary); background: rgba(255,255,255,0.03); transform: translateY(-3px); }
+
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.65rem; font-family: 'JetBrains Mono'; }
+        .tag { padding: 4px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
+        .tag-news { background: rgba(0, 242, 255, 0.15); color: var(--primary); }
+        .tag-update { background: rgba(241, 196, 15, 0.15); color: var(--update); }
+        .tag-project { background: rgba(112, 0, 255, 0.15); color: var(--secondary); }
+        .tag-idea { background: rgba(255, 255, 255, 0.05); color: #fff; }
+
+        /* PROGRESS */
+        .prog-track { height: 8px; background: #000; border-radius: 20px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .prog-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); box-shadow: 0 0 15px var(--primary); }
+
+        /* MODAL */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-box { background: #0a0a15; border: 1px solid var(--primary); padding: 40px; border-radius: 32px; width: 500px; box-shadow: 0 0 60px rgba(0, 242, 255, 0.1); }
+
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 14px; border-radius: 14px; color: #fff; margin: 10px 0; font-family: inherit; outline: none; }
+        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<script src="news-data.js"></script>
+
+<header>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <a href="index.html" class="btn-nav">← ГОЛОВНА</a>
+        <h2 style="letter-spacing: 3px; font-weight: 800; font-size: 1.1rem; color: var(--primary);">WHALES HUB</h2>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="text-align: right;">
+            <p id="player-name" style="font-weight: 800; font-size: 0.95rem;">Steve</p>
+            <p id="server-online" style="font-size: 0.6rem; color: var(--success); font-weight: 700;">ONLINE: 0/50</p>
+        </div>
+        <img id="player-head" src="" style="width: 40px; border-radius: 10px; border: 1.5px solid var(--primary); background: #000;">
+        <button class="btn-nav" onclick="App.logout()" style="color: var(--danger); border-color: rgba(255, 42, 109, 0.2);">ВИЙТИ</button>
+    </div>
+</header>
+
+<div class="wrapper">
+    <aside class="sidebar">
+        <div class="search-box">
+            <input type="text" oninput="App.search(this.value)" placeholder="Пошук записів...">
+        </div>
+
+        <p style="font-size: 0.6rem; color: #444; margin-bottom: 15px; font-weight: 800; letter-spacing: 2px;">КАТЕГОРІЇ</p>
+        <div class="nav-item active" onclick="App.setTab('news', this)"><span>📢</span> Новини</div>
+        <div class="nav-item" onclick="App.setTab('update', this)"><span>✨</span> Оновлення</div>
+        <div class="nav-item" onclick="App.setTab('project', this)"><span>🏗️</span> Проєкти</div>
+        <div class="nav-item" onclick="App.setTab('idea', this)"><span>💡</span> Пропозиції</div>
+
+        <button onclick="App.openModal()" style="margin-top: auto; padding: 20px; background: var(--primary); border: none; border-radius: 16px; font-weight: 800; cursor: pointer; color: #000; font-size: 0.9rem;">+ НОВИЙ ЗАПИС</button>
+    </aside>
+
+    <main class="feed-container" id="feed"></main>
+
+    <aside class="sidebar">
+        <h3 style="font-size: 0.8rem; margin-bottom: 25px; color: var(--primary); letter-spacing: 1.5px;">SYSTEM STATS</h3>
+        <div class="card" style="padding: 20px; margin-bottom: 15px; border: none; background: rgba(255,255,255,0.03);">
+            <p style="font-size: 0.6rem; color: #555; margin-bottom: 8px;">TOTAL ENTRIES</p>
+            <p id="stat-total" style="font-weight: 800; font-size: 1.8rem; color: var(--primary); font-family: 'JetBrains Mono';">0</p>
+        </div>
+        <div class="card" style="padding: 20px; border: none; background: rgba(255,255,255,0.03);">
+            <p style="font-size: 0.6rem; color: #555; margin-bottom: 8px;">USER RECORDS</p>
+            <p id="stat-user" style="font-weight: 800; font-size: 1.8rem; color: var(--secondary); font-family: 'JetBrains Mono';">0</p>
+        </div>
+
+        <div style="margin-top: auto; text-align: center;">
+            <p style="font-size: 0.5rem; color: #333; font-family: 'JetBrains Mono'; letter-spacing: 1px;">WHALES_OS CORE v2.5.4</p>
+            <p style="font-size: 0.45rem; color: var(--primary); opacity: 0.3;">CONNECTION STABLE // ENCRYPTED</p>
+        </div>
+    </aside>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h2 style="color: var(--primary); margin-bottom: 10px;">СТВОРИТИ ПУБЛІКАЦІЮ</h2>
+        <select id="f-type" onchange="App.toggleFields()">
+            <option value="news">📢 Новина</option>
+            <option value="update">✨ Оновлення</option>
+            <option value="project">🏗️ Проєкт</option>
+            <option value="idea">💡 Пропозиція</option>
+        </select>
+        <input type="text" id="f-title" placeholder="Заголовок">
+        <textarea id="f-desc" rows="5" placeholder="Ваш текст..."></textarea>
+
+        <div id="f-project-extra" style="display: none;">
+            <input type="number" id="f-prog" placeholder="Прогрес % (0-100)">
+            <input type="text" id="f-coords" placeholder="Координати">
+        </div>
+
+        <button onclick="App.save()" style="width: 100%; padding: 18px; background: var(--primary); border: none; border-radius: 14px; font-weight: 800; cursor: pointer; color: #000; margin-top: 15px;">ОПУБЛІКУВАТИ</button>
+        <button onclick="App.closeModal()" style="width: 100%; background: none; border: none; color: #444; margin-top: 10px; cursor: pointer;">СКАСУВАТИ</button>
+    </div>
+</div>
+
+<script>
+const App = {
+    storageKey: 'whales_hub_db',
+    userKey: 'playerNick',
+    data: [],
+    currentUser: '',
+    currentTab: 'news',
+
+    init() {
+        this.currentUser = localStorage.getItem(this.userKey) || "Steve";
+        this.loadData();
+        
+        document.getElementById('player-name').innerText = this.currentUser;
+        document.getElementById('player-head').src = `https://mc-heads.net/avatar/${this.currentUser}/40`;
+
+        this.render();
+        this.updateStats();
+        this.startOnlineSim();
+    },
+
+    loadData() {
+        const raw = localStorage.getItem(this.storageKey);
+        const localData = raw ? JSON.parse(raw) : [];
+        const officialData = (typeof WHALES_STORAGE !== 'undefined') ? WHALES_STORAGE.posts : [];
+        
+        this.data = [...localData, ...officialData];
+        this.data.sort((a, b) => b.id - a.id);
+    },
+
+    save() {
+        const title = document.getElementById('f-title').value;
+        const desc = document.getElementById('f-desc').value;
+        if(!title || !desc) return alert("Поля не можуть бути порожніми!");
+
+        const entry = {
+            id: Date.now(),
+            author: this.currentUser,
+            type: document.getElementById('f-type').value,
+            title, desc,
+            prog: document.getElementById('f-prog').value || 0,
+            coords: document.getElementById('f-coords').value || "Unknown",
+            date: new Date().toLocaleDateString('uk-UA')
+        };
+
+        const raw = localStorage.getItem(this.storageKey);
+        const db = raw ? JSON.parse(raw) : [];
+        db.unshift(entry);
+        localStorage.setItem(this.storageKey, JSON.stringify(db));
+
+        this.loadData();
+        this.closeModal();
+        this.render();
+        this.updateStats();
+    },
+
+    render(customData = null) {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = '';
+        
+        const dataToRender = customData || this.data.filter(i => i.type === this.currentTab);
+
+        if(dataToRender.length === 0) {
+            feed.innerHTML = `<div style="text-align:center; color:#222; margin-top:100px; font-weight:800; letter-spacing:5px;">DATABASE EMPTY</div>`;
+            return;
+        }
+
+        dataToRender.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="tag tag-${item.type}">${item.type}</span>
+                    <span>${item.date} // USER: <b style="color:var(--primary)">${item.author}</b></span>
+                </div>
+                <h2>${item.title}</h2>
+                <p style="color:#777; font-size:0.95rem; margin:15px 0;">${item.desc}</p>
+                ${item.type === 'project' ? `
+                    <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:16px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--primary); margin-bottom:8px; font-weight:800;">
+                            <span>BUILD PROGRESS</span>
+                            <span>${item.prog}%</span>
+                        </div>
+                        <div class="prog-track"><div class="prog-bar" style="width:${item.prog}%"></div></div>
+                        <div style="font-size:0.6rem; color:#444; font-family:'JetBrains Mono';">COORDS: ${item.coords}</div>
+                    </div>
+                ` : ''}
+                ${item.author === this.currentUser ? `
+                    <button onclick="App.delete(${item.id})" style="background:none; border:none; color:var(--danger); font-size:0.6rem; font-weight:800; cursor:pointer; margin-top:20px; opacity:0.3;">[ DELETE_ENTRY ]</button>
+                ` : ''}
+            `;
+            feed.appendChild(card);
+        });
+    },
+
+    search(query) {
+        const term = query.toLowerCase();
+        const results = this.data.filter(i => 
+            i.type === this.currentTab && 
+            (i.title.toLowerCase().includes(term) || i.desc.toLowerCase().includes(term))
+        );
+        this.render(results);
+    },
+
+    setTab(tab, el) {
+        this.currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        this.render();
+    },
+
+    updateStats() {
+        document.getElementById('stat-total').innerText = this.data.length;
+        document.getElementById('stat-user').innerText = this.data.filter(i => i.author === this.currentUser).length;
+    },
+
+    startOnlineSim() {
+        const update = () => {
+            const online = Math.floor(Math.random() * (22 - 14) + 14);
+            document.getElementById('server-online').innerText = `ONLINE: ${online}/50`;
+        };
+        update();
+        setInterval(update, 10000);
+    },
+
+    delete(id) {
+        if(confirm("Видалити цей запис?")) {
+            const raw = localStorage.getItem(this.storageKey);
+            let db = JSON.parse(raw).filter(i => i.id !== id);
+            localStorage.setItem(this.storageKey, JSON.stringify(db));
+            this.loadData();
+            this.render();
+            this.updateStats();
+        }
+    },
+
+    openModal() { document.getElementById('modal').style.display = 'flex'; },
+    closeModal() { document.getElementById('modal').style.display = 'none'; },
+    toggleFields() { document.getElementById('f-project-extra').style.display = document.getElementById('f-type').value === 'project' ? 'block' : 'none'; },
+    logout() { if(confirm("Вийти?")) { localStorage.removeItem(this.userKey); window.location.href = "activate.html"; } }
+};
+
+App.init();
+</script>
+</body>
+</html>
