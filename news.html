@@ -3,261 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES HUB | PRO TERMINAL</title>
+    <title>WHALES | APEX TERMINAL v3.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
-            --accent: #00f2ff;
-            --accent-dark: #7000ff;
-            --bg-deep: #020205;
-            --card-bg: rgba(10, 10, 18, 0.6);
-            --border: rgba(0, 242, 255, 0.12);
-            --text: #ffffff;
-            --text-muted: #6b6b7d;
+            --neon: #00f2ff;
+            --neon-glow: rgba(0, 242, 255, 0.4);
+            --void: #010103;
+            --panel-bg: rgba(8, 8, 15, 0.85);
+            --border: rgba(0, 242, 255, 0.2);
+            --magenta: #ff0055;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: default; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
         body { 
-            background: var(--bg-deep);
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--void);
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
             height: 100vh;
             overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(112, 0, 255, 0.05) 0%, transparent 40%);
+            perspective: 1000px;
         }
 
-        /* Анімація сітки на фоні */
-        body::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
-            opacity: 0.2;
-            z-index: -1;
+        /* Кастомний курсор-приціл */
+        #cursor {
+            width: 20px; height: 20px; border: 1px solid var(--neon);
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); transition: transform 0.1s ease;
+            border-radius: 50%; box-shadow: 0 0 10px var(--neon);
         }
+
+        /* Гексагональна сітка */
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: -1;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05), transparent),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.3;
+        }
+
+        /* Лінія сканування */
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 242, 255, 0.05) 50%, transparent);
+            background-size: 100% 4px; z-index: 100; pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
 
         header {
-            height: 90px;
-            padding: 0 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            background: rgba(0,0,0,0.4);
+            height: 110px; padding: 0 80px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--border);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(30px);
+            clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
         }
 
-        .logo-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 6px;
-            background: linear-gradient(90deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+        .brand { display: flex; align-items: center; gap: 30px; }
+        .brand h1 {
+            font-family: 'Syncopate', sans-serif; font-size: 1.5rem; letter-spacing: 12px;
+            text-transform: uppercase; color: var(--neon); text-shadow: 0 0 20px var(--neon-glow);
         }
 
         .wrapper {
-            display: grid;
-            grid-template-columns: 300px 1fr 320px;
-            height: calc(100vh - 90px);
-            padding: 30px;
-            gap: 30px;
+            display: grid; grid-template-columns: 340px 1fr 340px;
+            height: calc(100vh - 110px); padding: 40px; gap: 40px;
         }
 
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .glass-panel {
-            background: var(--card-bg);
+        .terminal-panel {
+            background: var(--panel-bg);
             border: 1px solid var(--border);
-            border-radius: 30px;
-            backdrop-filter: blur(15px);
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-btn {
-            padding: 18px 25px;
-            border-radius: 20px;
-            color: var(--text-muted);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid transparent;
-        }
-
-        .nav-btn:hover {
-            color: var(--text);
-            background: rgba(255,255,255,0.03);
-            transform: translateX(8px);
-        }
-
-        .nav-btn.active {
-            background: rgba(0, 242, 255, 0.05);
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-        }
-
-        .feed {
-            overflow-y: auto;
-            padding-right: 15px;
-        }
-
-        .news-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 35px;
-            padding: 40px;
-            margin-bottom: 30px;
-            transition: 0.5s;
-            position: relative;
-        }
-
-        .news-card:hover {
-            border-color: rgba(0, 242, 255, 0.4);
-            transform: scale(1.01);
-            background: rgba(15, 15, 30, 0.8);
-        }
-
-        .news-card h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .news-card p {
-            color: var(--text-muted);
-            line-height: 1.8;
-            font-size: 1rem;
-            white-space: pre-line;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 15px;
             border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: var(--accent);
-            color: #000;
-            margin-bottom: 20px;
+            position: relative; padding: 40px;
+            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.05);
+            display: flex; flex-direction: column;
         }
 
-        /* Кнопка виходу */
-        .logout-btn {
-            margin-top: auto;
-            background: rgba(255, 42, 109, 0.05);
-            border: 1px solid rgba(255, 42, 109, 0.2);
-            color: #ff2a6d;
-            padding: 18px;
-            border-radius: 20px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: 0.3s;
+        /* Кутові рамки */
+        .terminal-panel::before {
+            content: ""; position: absolute; top: -2px; left: -2px; width: 30px; height: 30px;
+            border-top: 3px solid var(--neon); border-left: 3px solid var(--neon);
+        }
+        .terminal-panel::after {
+            content: ""; position: absolute; bottom: -2px; right: -2px; width: 30px; height: 30px;
+            border-bottom: 3px solid var(--neon); border-right: 3px solid var(--neon);
         }
 
-        .logout-btn:hover {
-            background: #ff2a6d;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(255, 42, 109, 0.4);
-            transform: translateY(-3px);
+        .nav-link {
+            padding: 22px; margin-bottom: 15px; font-family: 'JetBrains Mono';
+            font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.4);
+            border-left: 2px solid transparent; transition: 0.4s;
+        }
+        .nav-link:hover { color: var(--neon); background: rgba(0,242,255,0.05); padding-left: 35px; }
+        .nav-link.active {
+            color: var(--neon); border-left: 4px solid var(--neon);
+            background: linear-gradient(90deg, rgba(0,242,255,0.1), transparent);
         }
 
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(255,255,255,0.03);
-            padding: 10px 25px;
-            border-radius: 25px;
-            border: 1px solid var(--border);
-        }
+        .feed { overflow-y: auto; padding-right: 20px; scroll-behavior: smooth; }
+        .feed::-webkit-scrollbar { width: 2px; }
+        .feed::-webkit-scrollbar-thumb { background: var(--neon); }
 
-        .p-img {
-            width: 45px;
-            height: 45px;
-            border-radius: 14px;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 15px var(--accent);
+        .article {
+            background: rgba(255,255,255,0.02); border-radius: 4px;
+            padding: 50px; border-left: 1px solid var(--border);
+            margin-bottom: 50px; position: relative;
+            animation: emerge 0.8s cubic-bezier(0, 1, 0, 1);
         }
+        @keyframes emerge { from { opacity: 0; transform: scale(0.95) rotateX(10deg); } to { opacity: 1; transform: scale(1) rotateX(0); } }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: skewX(-5deg) translateX(-30px); }
-            to { opacity: 1; transform: skewX(0) translateX(0); }
+        .article h2 { font-family: 'Syncopate', sans-serif; font-size: 1.8rem; margin-bottom: 20px; color: #fff; }
+        .article p { color: rgba(255,255,255,0.5); line-height: 2; font-size: 1.1rem; }
+
+        .exit-cmd {
+            margin-top: auto; border: 1px solid var(--magenta); background: transparent;
+            color: var(--magenta); padding: 25px; font-family: 'JetBrains Mono';
+            font-weight: 700; letter-spacing: 4px; transition: 0.3s;
         }
+        .exit-cmd:hover { background: var(--magenta); color: #fff; box-shadow: 0 0 30px var(--magenta); }
 
-        .news-card { animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        .stat-block { margin-bottom: 40px; }
+        .stat-label { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--neon); opacity: 0.6; }
+        .stat-num { font-size: 5rem; font-weight: 300; line-height: 1; letter-spacing: -5px; color: #fff; }
+
+        .profile-hex {
+            display: flex; align-items: center; gap: 20px;
+            padding: 10px 25px; background: rgba(0,242,255,0.05);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
     </style>
 </head>
 <body>
 
+<div id="cursor"></div>
+<div class="bg-overlay"></div>
+<div class="scanline"></div>
+
 <script src="news-data.js"></script>
 
 <header>
-    <div class="logo-box">
-        <div style="width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent);"></div>
-        <h1 class="logo-text">Whales Terminal</h1>
+    <div class="brand">
+        <i class="fa-solid fa-ghost" style="color: var(--neon); font-size: 1.5rem;"></i>
+        <h1>WHALES_APEX</h1>
     </div>
     
-    <div class="profile-section">
+    <div class="profile-hex">
         <div style="text-align: right;">
-            <p id="p-name" style="font-weight: 800; letter-spacing: 1px;">PLAYER</p>
-            <p style="font-size: 0.55rem; color: var(--accent); font-weight: 700;">ENCRYPTED SESSION</p>
+            <p id="p-name" style="font-weight: 800; letter-spacing: 2px;">GHOST_USER</p>
+            <p style="font-size: 0.5rem; color: var(--neon); font-family: 'JetBrains Mono';">LEVEL: 01 // SECTOR: 7</p>
         </div>
-        <img id="p-head" src="" class="p-img">
+        <img id="p-head" src="" style="width: 45px; height: 45px; border-radius: 4px;">
     </div>
 </header>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <div class="glass-panel" style="flex: 1; display: flex; flex-direction: column;">
-            <p style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 25px; letter-spacing: 3px; font-weight: 800;">MAIN_MENU</p>
-            
-            <div class="nav-btn active" onclick="App.setTab('news', this)">
-                <i class="fa-solid fa-house-signal"></i> BROADCAST
-            </div>
-            <div class="nav-btn" onclick="App.setTab('update', this)">
-                <i class="fa-solid fa-code-merge"></i> REVISIONS
-            </div>
-            <div class="nav-item nav-btn" onclick="App.setTab('project', this)">
-                <i class="fa-solid fa-microchip"></i> PROJECTS
+        <div class="terminal-panel" style="height: 100%;">
+            <span class="stat-label">// NAVIGATION_CORE</span>
+            <div style="margin-top: 30px;">
+                <div class="nav-link active" onclick="App.setTab('news', this)">01. GLOBAL_FEED</div>
+                <div class="nav-link" onclick="App.setTab('update', this)">02. SYSTEM_PATCHES</div>
+                <div class="nav-link" onclick="App.setTab('project', this)">03. ARCHITECTURE</div>
             </div>
 
-            <button class="logout-btn" onclick="App.logout()">
-                <i class="fa-solid fa-power-off"></i> TERMINATE SESSION
+            <button class="exit-cmd" onclick="App.logout()">
+                > TERMINATE_CONNECTION
             </button>
         </div>
     </aside>
@@ -265,34 +181,38 @@
     <main class="feed" id="feed"></main>
 
     <aside class="sidebar">
-        <div class="glass-panel">
-            <p style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 25px; letter-spacing: 3px; font-weight: 800;">CORE_STATS</p>
-            
-            <div style="margin-bottom: 30px;">
-                <p style="font-size: 0.7rem; color: var(--text-muted);">TOTAL DATA UNITS</p>
-                <h1 id="stat-total" style="font-size: 3.5rem; font-family: 'Space Grotesk'; color: var(--accent);">0</h1>
+        <div class="terminal-panel">
+            <span class="stat-label">// DATA_METRICS</span>
+            <div class="stat-block">
+                <h1 class="stat-num" id="stat-total">0</h1>
+                <p style="font-size: 0.7rem; color: rgba(255,255,255,0.2);">AVAILABLE_RECORDS</p>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.7rem; display: flex; justify-content: space-between;">
-                    <span style="color:var(--text-muted)">UPLINK:</span>
-                    <span style="color:var(--accent)">STABLE</span>
+            <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span class="stat-label">STABILITY:</span><span style="color:var(--neon)">99%</span>
                 </div>
-                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.7rem; display: flex; justify-content: space-between;">
-                    <span style="color:var(--text-muted)">ENCRYPTION:</span>
-                    <span style="color:var(--accent)">SHA-256</span>
+                <div style="height: 2px; background: rgba(0,242,255,0.1);">
+                    <div style="width: 99%; height: 100%; background: var(--neon);"></div>
                 </div>
             </div>
         </div>
-        
-        <div class="glass-panel" style="background: linear-gradient(135deg, rgba(112, 0, 255, 0.1), transparent);">
-            <p style="font-size: 0.6rem; color: #7000ff; font-weight: 800;">ADVERTISEMENT</p>
-            <p style="font-size: 0.8rem; margin-top: 10px; color: #fff;">Приєднуйся до дискорду для отримання ролі тестера!</p>
+
+        <div class="terminal-panel" style="margin-top: 40px; border-color: rgba(255,255,255,0.05);">
+            <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono';">
+                LOG: Соединение установлено через порт 8080. Все протоколы защиты активны. Ожидание команд пользователя...
+            </p>
         </div>
     </aside>
 </div>
 
 <script>
+// Слідкування курсора
+document.addEventListener('mousemove', e => {
+    document.getElementById('cursor').style.left = e.clientX + 'px';
+    document.getElementById('cursor').style.top = e.clientY + 'px';
+});
+
 const App = {
     currentTab: 'news',
     data: [],
@@ -318,54 +238,55 @@ const App = {
         
         items.forEach((item, index) => {
             $feed.append(`
-                <div class="news-card" style="animation-delay: ${index * 0.1}s">
-                    <div class="badge">${item.type}</div>
-                    <div style="float: right; font-size: 0.7rem; color: var(--text-muted); font-family: 'Space Grotesk';">
-                        ID: ${item.id} // ${item.date}
+                <div class="article" style="animation-delay: ${index * 0.1}s">
+                    <div style="font-family:'JetBrains Mono'; color:var(--neon); font-size:0.7rem; margin-bottom:15px;">
+                        [ TYPE: ${item.type} // DATE: ${item.date} ]
                     </div>
                     <h2>${item.title}</h2>
                     <p>${item.desc}</p>
                     ${item.type === 'project' ? `
-                        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
-                            <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--accent); margin-bottom:10px;">
-                                <span>CONSTRUCTION_PROGRESS</span><span>${item.prog}%</span>
+                        <div style="margin-top:35px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.6rem; margin-bottom:10px;">
+                                <span>BUILDING_STATE</span><span>${item.prog}%</span>
                             </div>
-                            <div style="height:4px; background:rgba(255,255,255,0.05); border-radius:10px;">
-                                <div style="width:${item.prog}%; height:100%; background:var(--accent); box-shadow: 0 0 15px var(--accent);"></div>
+                            <div style="height:2px; background:rgba(255,255,255,0.05);">
+                                <div style="width:${item.prog}%; height:100%; background:var(--neon); box-shadow:0 0 15px var(--neon);"></div>
                             </div>
                         </div>
                     ` : ''}
                 </div>
             `);
         });
-        $('#stat-total').text(this.data.length);
+        $('#stat-total').text(this.data.length < 10 ? '0' + this.data.length : this.data.length);
     },
 
     setTab(t, el) {
         this.currentTab = t;
-        $('.nav-btn').removeClass('active');
+        $('.nav-link').removeClass('active');
         $(el).addClass('active');
         this.render();
     },
 
     logout() {
         Swal.fire({
-            title: 'TERMINATE SESSION?',
-            text: "Ви будете перенаправлені на сторінку входу",
+            title: 'TERMINATE?',
+            text: "Розірвати захищений зв'язок?",
             icon: 'warning',
-            background: '#0a0a15',
+            background: '#010103',
             color: '#fff',
             showCancelButton: true,
-            confirmButtonColor: '#ff2a6d',
-            cancelButtonColor: '#111',
-            confirmButtonText: 'LOGOUT',
-            cancelButtonText: 'CANCEL'
+            confirmButtonColor: '#ff0055',
+            confirmButtonText: 'EXIT',
+            cancelButtonText: 'STAY'
         }).then((result) => {
             if (result.isConfirmed) {
-                localStorage.removeItem('playerNick');
-                window.location.href = 'index.html';
+                document.body.style.opacity = '0';
+                setTimeout(() => {
+                    localStorage.removeItem('playerNick');
+                    window.location.href = 'index.html';
+                }, 500);
             }
-        })
+        });
     }
 };
 
