@@ -3,244 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES | QUANTUM CORE v4.0</title>
+    <title>WHALES | OMNIVERSE CORE</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@200;400;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
-            --q-cyan: #00f2ff;
-            --q-magenta: #bc00ff;
-            --q-blue: #0044ff;
-            --q-void: #000205;
-            --q-border: rgba(0, 242, 255, 0.2);
-            --q-glass: rgba(0, 5, 15, 0.8);
+            --glow: #00f2ff;
+            --glow-alt: #7000ff;
+            --bg: #000103;
+            --panel: rgba(5, 7, 15, 0.85);
+            --line: rgba(0, 242, 255, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
         
         body { 
-            background: var(--q-void);
-            color: #fff;
-            font-family: 'Exo 2', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            perspective: 2000px;
+            background: var(--bg); color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            height: 100vh; overflow: hidden;
+            perspective: 2500px;
         }
 
-        /* Динамічний Canvas Фон */
-        #canvas-bg { position: fixed; inset: 0; z-index: -2; background: #000; }
+        /* Енергетичний фон */
+        #energy-canvas { position: fixed; inset: 0; z-index: -1; }
 
-        /* Кастомний лазерний курсор */
-        #cursor-laser {
-            width: 40px; height: 40px; border: 1px solid var(--q-cyan);
-            position: fixed; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #cursor-laser::after { content: ''; width: 4px; height: 4px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px var(--q-cyan); }
-
-        /* Ефекти шарів */
-        .overlay-scan {
-            position: fixed; inset: 0; z-index: 1000; pointer-events: none;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-        }
-
-        header {
-            height: 120px; padding: 0 100px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--q-glass); backdrop-filter: blur(40px);
-            border-bottom: 1px solid var(--q-border);
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 5% 100%, 0 70%);
-        }
-
-        .sys-title {
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2rem;
-            letter-spacing: 15px; color: #fff; text-shadow: 0 0 30px var(--q-cyan);
-        }
-
-        .wrapper {
-            display: grid; grid-template-columns: 360px 1fr 360px;
-            height: calc(100vh - 120px); padding: 50px; gap: 50px;
-        }
-
-        /* Паралакс Панель */
-        .parallax-panel {
-            background: var(--q-glass); border: 1px solid var(--q-border);
-            border-radius: 15px; padding: 40px;
+        /* Кастомний сингулярний курсор */
+        #cursor-core {
+            width: 8px; height: 8px; background: #fff; position: fixed;
+            border-radius: 50%; pointer-events: none; z-index: 10000;
+            box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
             transition: transform 0.1s ease-out;
-            transform-style: preserve-3d;
+        }
+        #cursor-ring {
+            width: 40px; height: 40px; border: 1px solid var(--glow);
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 9999; transition: 0.15s ease-out; opacity: 0.5;
+        }
+
+        /* Загальний макет */
+        .master-container {
+            display: grid; grid-template-columns: 380px 1fr 380px;
+            height: 100vh; padding: 40px; gap: 40px;
+            background: radial-gradient(circle at center, rgba(0, 242, 255, 0.02) 0%, transparent 70%);
+        }
+
+        .omni-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 2px; /* Гострі кути для стилю High-Tech */
+            backdrop-filter: blur(50px);
+            padding: 45px;
+            position: relative;
             display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+            transform-style: preserve-3d;
+            transition: 0.3s ease-out;
+        }
+
+        /* Декоративні кути */
+        .corner { position: absolute; width: 20px; height: 20px; border: 2px solid var(--glow); }
+        .tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        .header-brand {
+            font-family: 'Syncopate', sans-serif; font-weight: 700;
+            font-size: 1.2rem; letter-spacing: 10px; color: var(--glow);
+            margin-bottom: 50px; display: flex; align-items: center; gap: 15px;
         }
 
         .nav-link {
-            padding: 25px; margin-bottom: 15px; border-radius: 5px;
-            font-family: 'Fira Code', monospace; font-size: 0.9rem;
-            background: rgba(255,255,255,0.02); border: 1px solid transparent;
-            transition: 0.3s; color: rgba(255,255,255,0.5);
+            padding: 24px; margin-bottom: 20px; position: relative;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            color: rgba(255,255,255,0.3); border: 1px solid transparent;
+            transition: 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+            text-transform: uppercase; letter-spacing: 3px;
         }
-        .nav-link:hover { background: rgba(0,242,255,0.05); color: #fff; transform: translateZ(20px); }
+        .nav-link:hover { color: #fff; background: rgba(0, 242, 255, 0.03); transform: translateZ(30px); }
         .nav-link.active {
-            border-color: var(--q-cyan); color: var(--q-cyan);
-            background: radial-gradient(circle at left, rgba(0,242,255,0.1), transparent);
-            box-shadow: -10px 0 20px rgba(0,242,255,0.1);
+            color: var(--glow); border: 1px solid var(--line);
+            background: linear-gradient(90deg, rgba(0, 242, 255, 0.05), transparent);
+            box-shadow: inset 0 0 20px rgba(0, 242, 255, 0.05);
         }
 
-        .feed { overflow-y: auto; padding-right: 25px; perspective: 1000px; }
-        .feed::-webkit-scrollbar { width: 1px; }
-
-        .quantum-card {
-            background: rgba(255,255,255,0.01); border: 1px solid var(--q-border);
-            padding: 60px; margin-bottom: 60px; position: relative;
-            transform: translateZ(0); transition: 0.5s;
+        .back-btn {
+            margin-top: auto; padding: 25px; border: 1px solid var(--glow);
+            background: transparent; color: var(--glow); font-family: 'Syncopate';
+            font-size: 0.7rem; letter-spacing: 5px; transition: 0.4s;
+            text-decoration: none; text-align: center;
         }
-        .quantum-card:hover { background: rgba(255,255,255,0.03); transform: translateZ(30px); border-color: #fff; }
+        .back-btn:hover { background: var(--glow); color: #000; box-shadow: 0 0 50px var(--glow); }
 
-        .quantum-card::before {
-            content: "SECURED_DATA"; position: absolute; top: 10px; right: 20px;
-            font-size: 0.5rem; color: var(--q-cyan); opacity: 0.4; font-family: 'Fira Code';
+        .feed-area { overflow-y: auto; padding-right: 20px; perspective: 1000px; }
+        .feed-area::-webkit-scrollbar { width: 0px; }
+
+        .omni-card {
+            background: rgba(255,255,255,0.01); border: 1px solid var(--line);
+            padding: 60px; margin-bottom: 40px; position: relative;
+            transition: 0.6s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+        .omni-card:hover { 
+            background: rgba(0, 242, 255, 0.02); 
+            border-color: var(--glow);
+            transform: scale(1.02) translateZ(50px);
         }
 
-        .quantum-card h2 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; margin-bottom: 25px; font-weight: 700; }
-        .quantum-card p { color: rgba(255,255,255,0.7); line-height: 2.2; font-size: 1.1rem; font-weight: 300; }
+        .card-meta { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--glow); margin-bottom: 25px; opacity: 0.6; }
+        .omni-card h2 { font-family: 'Syncopate', sans-serif; font-size: 2rem; margin-bottom: 20px; font-weight: 700; }
+        .omni-card p { color: rgba(255,255,255,0.5); line-height: 2.2; font-size: 1.1rem; }
 
-        .exit-sequence {
-            margin-top: auto; padding: 25px; border: 1px solid #ff0044;
-            background: transparent; color: #ff0044; font-family: 'Orbitron';
-            font-size: 0.8rem; font-weight: 700; letter-spacing: 5px;
-            transition: 0.4s; overflow: hidden; position: relative;
-        }
-        .exit-sequence:hover { background: #ff0044; color: #fff; box-shadow: 0 0 40px #ff0044; }
+        .stat-display { margin-bottom: 60px; border-left: 2px solid var(--glow); padding-left: 30px; }
+        .stat-label { font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--glow); opacity: 0.5; margin-bottom: 10px; }
+        .stat-value { font-size: 6rem; font-family: 'Syncopate'; font-weight: 700; line-height: 1; letter-spacing: -5px; }
 
-        .stat-circle {
-            width: 180px; height: 180px; border-radius: 50%;
-            border: 2px solid var(--q-border); margin: 0 auto 30px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative;
-        }
-        .stat-circle::after {
-            content: ''; position: absolute; inset: -10px; border: 1px dashed var(--q-cyan);
-            border-radius: 50%; animation: rotate 20s linear infinite;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .profile-wrap {
-            display: flex; align-items: center; gap: 25px;
-            padding: 10px 40px; background: rgba(0,0,0,0.6);
-            border: 1px solid var(--q-border); border-radius: 100px;
+        .profile-sector {
+            padding: 20px; border: 1px solid var(--line); margin-top: auto;
+            display: flex; align-items: center; gap: 20px;
         }
     </style>
 </head>
 <body>
 
-<canvas id="canvas-bg"></canvas>
-<div id="cursor-laser"></div>
-<div class="overlay-scan"></div>
+<canvas id="energy-canvas"></canvas>
+<div id="cursor-core"></div>
+<div id="cursor-ring"></div>
 
 <script src="news-data.js"></script>
 
-<header>
-    <div class="sys-title">WHALES.CORE</div>
-    
-    <div class="profile-wrap">
-        <div style="text-align: right;">
-            <p id="p-name" style="font-family: 'Orbitron'; font-weight: 700; letter-spacing: 2px; color: var(--q-cyan);">ROOT_USER</p>
-            <p style="font-size: 0.6rem; color: #fff; opacity: 0.5;">MEMETIC_LINK: ACTIVE</p>
+<div class="master-container">
+    <aside class="omni-panel" id="nav-panel">
+        <div class="corner tl"></div>
+        <div class="header-brand">
+            <div style="width: 10px; height: 10px; background: var(--glow); box-shadow: 0 0 15px var(--glow);"></div>
+            WHALES
         </div>
-        <img id="p-head" src="" style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--q-cyan);">
-    </div>
-</header>
 
-<div class="wrapper">
-    <aside class="sidebar">
-        <div class="parallax-panel" id="left-panel">
-            <p style="font-family: 'Fira Code'; font-size: 0.6rem; color: var(--q-cyan); margin-bottom: 30px;">// SYSTEM_INTERFACE</p>
-            <div class="nav-link active" onclick="App.setTab('news', this)">[ 01 ] NEURAL_FEED</div>
-            <div class="nav-link" onclick="App.setTab('update', this)">[ 02 ] KERNEL_PATCH</div>
-            <div class="nav-link" onclick="App.setTab('project', this)">[ 03 ] MEGACYCLE_LOG</div>
+        <div class="nav-link active" onclick="App.setTab('news', this)">// Stream_01</div>
+        <div class="nav-link" onclick="App.setTab('update', this)">// Stream_02</div>
+        <div class="nav-link" onclick="App.setTab('project', this)">// Stream_03</div>
 
-            <button class="exit-sequence" onclick="App.logout()">
-                TERMINATE_LINK
-            </button>
-        </div>
+        <a href="index.html" class="back-btn">
+            BACK_TO_ORIGIN
+        </a>
     </aside>
 
-    <main class="feed" id="feed"></main>
+    <main class="feed-area" id="feed"></main>
 
-    <aside class="sidebar">
-        <div class="parallax-panel" id="right-panel">
-            <p style="font-family: 'Fira Code'; font-size: 0.6rem; color: var(--q-cyan); margin-bottom: 30px;">// CORE_METRICS</p>
-            
-            <div class="stat-circle">
-                <span style="font-size: 0.7rem; color: var(--q-cyan);">INDEX_COUNT</span>
-                <h1 id="stat-total" style="font-size: 3.5rem; font-family: 'Orbitron';">00</h1>
+    <aside class="omni-panel" id="data-panel">
+        <div class="corner br"></div>
+        
+        <div class="stat-display">
+            <p class="stat-label">TOTAL_INDEX_RECORDS</p>
+            <h1 class="stat-value" id="stat-total">00</h1>
+        </div>
+
+        <div style="margin-bottom: 40px; padding: 25px; border: 1px solid var(--line); background: rgba(0, 242, 255, 0.02);">
+            <p class="stat-label">CONNECTION_STATUS</p>
+            <p style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #fff;">OMNIVERSE_LINK: SECURED</p>
+            <div style="margin-top: 15px; height: 1px; background: var(--line); width: 100%;">
+                <div style="width: 100%; height: 100%; background: var(--glow); box-shadow: 0 0 10px var(--glow);"></div>
             </div>
+        </div>
 
-            <div style="background: rgba(0,242,255,0.03); padding: 30px; border-radius: 10px; border-left: 3px solid var(--q-cyan);">
-                <p style="font-size: 0.8rem; line-height: 1.8; font-family: 'Fira Code'; color: rgba(255,255,255,0.6);">
-                    LOG: Систему синхронізовано з хмарою. Затримка 2ms. Всі квантові вузли в стані когерентності.
-                </p>
+        <div class="profile-sector">
+            <img id="p-head" src="" style="width: 50px; height: 50px; border: 1px solid var(--glow);">
+            <div>
+                <p id="p-name" style="font-family: 'Syncopate'; font-size: 0.8rem; letter-spacing: 1px;">USER</p>
+                <p style="font-size: 0.5rem; color: var(--glow); font-family: 'JetBrains Mono';">BIO_LINK: SYNCED</p>
             </div>
         </div>
     </aside>
 </div>
 
 <script>
-// Canvas Нейронний Фон
-const canvas = document.getElementById('canvas-bg');
-const ctx = canvas.getContext('2d');
-let points = [];
-
-function initCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    points = [];
-    for(let i=0; i<80; i++) points.push({
-        x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-        vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5
-    });
-}
-
-function drawCanvas() {
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    ctx.fillStyle = "rgba(0, 242, 255, 0.5)";
-    ctx.strokeStyle = "rgba(0, 242, 255, 0.05)";
-    points.forEach((p, i) => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x<0 || p.x>canvas.width) p.vx*=-1;
-        if(p.y<0 || p.y>canvas.height) p.vy*=-1;
-        ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
-        for(let j=i+1; j<points.length; j++) {
-            let p2 = points[j];
-            let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
-            if(dist < 200) {
-                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-            }
-        }
-    });
-    requestAnimationFrame(drawCanvas);
-}
-
-// Паралакс та Курсор
+// Керування курсором
 document.addEventListener('mousemove', e => {
-    const laser = document.getElementById('cursor-laser');
-    laser.style.left = e.clientX + 'px';
-    laser.style.top = e.clientY + 'px';
+    const core = document.getElementById('cursor-core');
+    const ring = document.getElementById('cursor-ring');
+    core.style.left = e.clientX + 'px'; core.style.top = e.clientY + 'px';
+    ring.style.left = (e.clientX - 20) + 'px'; ring.style.top = (e.clientY - 20) + 'px';
 
-    const xAxis = (window.innerWidth / 2 - e.clientX) / 50;
-    const yAxis = (window.innerHeight / 2 - e.clientY) / 50;
-    
-    document.getElementById('left-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
-    document.getElementById('right-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+    // Паралакс панелей
+    const xAxis = (window.innerWidth / 2 - e.clientX) / 80;
+    const yAxis = (window.innerHeight / 2 - e.clientY) / 80;
+    document.getElementById('nav-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+    document.getElementById('data-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
 });
 
-window.addEventListener('resize', initCanvas);
-initCanvas(); drawCanvas();
+// Енергетичний фон (Canvas)
+const canvas = document.getElementById('energy-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function init() {
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    particles = [];
+    for(let i=0; i<50; i++) particles.push({
+        x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+        size: Math.random()*2, speedX: Math.random()*0.5 - 0.25, speedY: Math.random()*0.5 - 0.25
+    });
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0, 242, 255, 0.2)";
+    particles.forEach(p => {
+        p.x += p.speedX; p.y += p.speedY;
+        if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+        if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(animate);
+}
+init(); animate();
 
 const App = {
     currentTab: 'news',
@@ -249,7 +226,7 @@ const App = {
     init() {
         const nick = localStorage.getItem('playerNick') || "Steve";
         $('#p-name').text(nick.toUpperCase());
-        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/120`);
+        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/100`);
         this.load();
     },
 
@@ -267,19 +244,17 @@ const App = {
         
         items.forEach((item, index) => {
             $feed.append(`
-                <div class="quantum-card" style="animation: slideIn 0.8s ${index * 0.1}s cubic-bezier(0,1,0,1) forwards; opacity:0;">
-                    <span style="font-family:'Fira Code'; color:var(--q-cyan); font-size:0.7rem; letter-spacing:3px;">
-                        // ENTITY_TYPE: ${item.type.toUpperCase()} // TIMESTAMP: ${item.date}
-                    </span>
-                    <h2 style="margin-top:20px; text-shadow: 0 0 20px rgba(255,255,255,0.2);">${item.title}</h2>
-                    <p style="margin-top:20px;">${item.desc}</p>
+                <div class="omni-card" style="animation: slide 1s ${index * 0.1}s cubic-bezier(0,1,0,1) forwards; opacity:0;">
+                    <div class="card-meta">[ TRANSMISSION_ID: ${item.id} // SEC_TYPE: ${item.type.toUpperCase()} ]</div>
+                    <h2>${item.title}</h2>
+                    <p>${item.desc}</p>
                     ${item.type === 'project' ? `
-                        <div style="margin-top:40px; padding:30px; background:rgba(255,255,255,0.02); border-radius:5px;">
-                            <div style="display:flex; justify-content:space-between; font-family:'Orbitron'; font-size:0.6rem; margin-bottom:15px; color:var(--q-cyan);">
-                                <span>CONSTRUCTION_INTEGRITY</span><span>${item.prog}%</span>
+                        <div style="margin-top:40px; border-left: 1px solid var(--glow); padding-left:20px;">
+                            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.6rem; color:var(--glow); margin-bottom:10px;">
+                                <span>STRUCTURAL_INTEGRITY</span><span>${item.prog}%</span>
                             </div>
-                            <div style="height:1px; background:rgba(255,255,255,0.1);">
-                                <div style="width:${item.prog}%; height:100%; background:var(--q-cyan); box-shadow:0 0 15px var(--q-cyan);"></div>
+                            <div style="height:2px; background:rgba(0,242,255,0.05);">
+                                <div style="width:${item.prog}%; height:100%; background:var(--glow); box-shadow:0 0 10px var(--glow);"></div>
                             </div>
                         </div>
                     ` : ''}
@@ -294,29 +269,6 @@ const App = {
         $('.nav-link').removeClass('active');
         $(el).addClass('active');
         this.render();
-    },
-
-    logout() {
-        Swal.fire({
-            title: 'TERMINATE LINK?',
-            text: "Розірвати нейронний зв'язок з ядром?",
-            icon: 'warning',
-            background: '#00050f',
-            color: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#ff0044',
-            confirmButtonText: 'DISCONNECT',
-            cancelButtonText: 'MAINTAIN'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.body.style.filter = 'blur(20px) brightness(0)';
-                document.body.style.transition = '1s';
-                setTimeout(() => {
-                    localStorage.removeItem('playerNick');
-                    window.location.href = 'index.html';
-                }, 1000);
-            }
-        });
     }
 };
 
@@ -324,7 +276,7 @@ $(window).on('load', () => App.init());
 </script>
 
 <style>
-@keyframes slideIn { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slide { from { opacity: 0; transform: translateY(100px) rotateX(-20deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
 </style>
 </body>
 </html>
