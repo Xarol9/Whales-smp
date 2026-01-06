@@ -3,66 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES HUB | ULTRA EDITION</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>WHALES HUB | СИСТЕМА СИНХРОНІЗАЦІЇ</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         :root {
             --primary: #00f2ff; --secondary: #7000ff; --danger: #ff2a6d;
-            --bg: #05050a; --card-bg: rgba(20, 20, 35, 0.6); --border: rgba(0, 242, 255, 0.1);
+            --update: #f1c40f; --success: #00ff88; --bg: #05050a;
+            --panel: rgba(15, 15, 25, 0.9); --border: rgba(0, 242, 255, 0.15);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.25s ease; }
         body { 
             background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; 
             height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% -20%, #1a1a35 0%, var(--bg) 100%);
         }
 
-        /* HEADER */
         header {
-            height: 80px; background: rgba(0,0,0,0.7); backdrop-filter: blur(25px);
+            height: 70px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border); display: flex;
-            justify-content: space-between; align-items: center; padding: 0 40px;
+            justify-content: space-between; align-items: center; padding: 0 30px; z-index: 1000;
         }
-        .profile-box { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); }
 
-        /* GRID SYSTEM */
-        .app-container { display: grid; grid-template-columns: 300px 1fr 320px; height: calc(100vh - 80px); padding: 25px; gap: 25px; }
+        .wrapper { display: grid; grid-template-columns: 280px 1fr 300px; height: calc(100vh - 70px); padding: 20px; gap: 20px; }
+        .sidebar { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; }
+        .feed-container { overflow-y: auto; padding-right: 15px; scroll-behavior: smooth; }
 
-        .glass-panel { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 30px; padding: 25px; display: flex; flex-direction: column; }
-
-        /* FEED */
-        .feed { overflow-y: auto; scroll-behavior: smooth; padding-right: 10px; }
-        .feed::-webkit-scrollbar { width: 4px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-
-        .post-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-            padding: 30px; border-radius: 25px; margin-bottom: 20px; position: relative;
-            animation: fadeIn 0.4s ease forwards;
+        .nav-item {
+            padding: 14px 18px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
+            font-weight: 700; color: #555; display: flex; align-items: center; gap: 15px;
         }
-        .post-card:hover { border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,242,255,0.05); transform: translateY(-3px); }
+        .nav-item.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); border-left: 4px solid var(--primary); }
 
-        /* UI ELEMENTS */
-        .nav-btn {
-            padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; cursor: pointer;
-            font-weight: 700; color: #555; transition: 0.3s; display: flex; align-items: center; gap: 12px;
+        .card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px; padding: 30px; margin-bottom: 20px;
         }
-        .nav-btn.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); box-shadow: inset 4px 0 0 var(--primary); }
+        .tag { padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.6rem; text-transform: uppercase; }
+        .tag-news { background: rgba(0, 242, 255, 0.1); color: var(--primary); }
+        .tag-update { background: rgba(241, 196, 15, 0.1); color: var(--update); }
+        .tag-project { background: rgba(112, 0, 255, 0.1); color: var(--secondary); }
 
-        .btn-action {
-            background: var(--primary); border: none; padding: 18px; border-radius: 18px;
-            font-weight: 800; cursor: pointer; color: #000; text-transform: uppercase; letter-spacing: 1px;
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
         }
-        .btn-action:hover { box-shadow: 0 0 25px rgba(0,242,255,0.4); transform: scale(1.02); }
+        .modal-box { background: #0a0a15; border: 1px solid var(--primary); padding: 40px; border-radius: 32px; width: 500px; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(10px); }
-        .modal-content { background: #0a0a1a; padding: 40px; border-radius: 35px; width: 450px; border: 1px solid var(--primary); }
-
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 15px; border-radius: 15px; color: #fff; margin-bottom: 15px; font-size: 0.9rem; }
-        input:focus { border-color: var(--primary); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 14px; border-radius: 14px; color: #fff; margin: 10px 0; font-family: inherit; }
+        .btn { background: var(--primary); border: none; padding: 18px; border-radius: 16px; font-weight: 800; cursor: pointer; color: #000; width: 100%; }
     </style>
 </head>
 <body>
@@ -70,187 +65,162 @@
 <script src="news-data.js"></script>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 20px;">
-        <a href="index.html" style="text-decoration:none; color:#555; font-weight:800; font-size:0.8rem;">← ГОЛОВНА</a>
-        <h1 style="font-size: 1.4rem; letter-spacing: 4px; font-weight: 800; color: var(--primary);">WHALES HUB</h1>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <h2 style="letter-spacing: 2px; font-weight: 800; color: var(--primary);">WHALES HUB</h2>
     </div>
-
-    <div class="profile-box">
+    <div style="display: flex; align-items: center; gap: 15px;">
         <div style="text-align: right;">
-            <p id="p-name" style="font-weight: 800; font-size: 0.9rem;">Steve</p>
-            <p style="font-size: 0.6rem; color: #00ff88; font-weight: 800;">CONNECTED</p>
+            <p id="p-name" style="font-weight: 800;">Steve</p>
+            <p id="p-online" style="font-size: 0.6rem; color: var(--success);">ONLINE: 0/100</p>
         </div>
-        <img id="p-head" src="" style="width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--primary);">
+        <img id="p-head" src="" style="width: 40px; border-radius: 10px; border: 1px solid var(--primary);">
+        <button onclick="App.logout()" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fa-solid fa-power-off"></i></button>
     </div>
 </header>
 
-<div class="app-container">
-    <aside class="glass-panel">
-        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px; letter-spacing: 2px; font-weight: 800;">NAVIGATOR</p>
-        <div class="nav-btn active" onclick="App.tab('news', this)">📢 Новини</div>
-        <div class="nav-btn" onclick="App.tab('update', this)">✨ Оновлення</div>
-        <div class="nav-btn" onclick="App.tab('project', this)">🏗️ Проєкти</div>
-        <div class="nav-btn" onclick="App.tab('idea', this)">💡 Пропозиції</div>
-        
-        <button class="btn-action" onclick="App.openModal()" style="margin-top: auto;">+ Створити запис</button>
+<div class="wrapper">
+    <aside class="sidebar">
+        <input type="text" oninput="App.search(this.value)" placeholder="🔍 Пошук...">
+        <div class="nav-item active" onclick="App.setTab('news', this)"><i class="fa-solid fa-bullhorn"></i> Новини</div>
+        <div class="nav-item" onclick="App.setTab('update', this)"><i class="fa-solid fa-sparkles"></i> Оновлення</div>
+        <div class="nav-item" onclick="App.setTab('project', this)"><i class="fa-solid fa-hammer"></i> Проєкти</div>
+        <button class="btn" style="margin-top: auto;" onclick="App.openModal()">+ НОВИЙ ЗАПИС</button>
     </aside>
 
-    <main class="feed" id="feed-root"></main>
+    <main class="feed-container" id="feed"></main>
 
-    <aside class="glass-panel">
-        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px; letter-spacing: 2px; font-weight: 800;">STATISTICS</p>
-        <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px;">
-            <p style="font-size: 0.7rem; color: #666;">АКТИВНІСТЬ ХАБУ</p>
-            <h2 id="total-count" style="font-size: 2.5rem; color: var(--primary);">0</h2>
-        </div>
-        <div style="margin-top: auto; padding: 20px; background: rgba(112,0,255,0.05); border-radius: 20px; border: 1px solid rgba(112,0,255,0.1);">
-            <p style="font-size: 0.6rem; color: var(--secondary); font-weight: 800;">BUILD STATUS</p>
-            <p style="font-size: 0.8rem; margin-top: 5px;">Всі модулі синхронізовано.</p>
+    <aside class="sidebar">
+        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px;">СТАТИСТИКА БАЗИ</p>
+        <div class="card" style="padding: 15px; margin-bottom: 10px;">
+            <p style="font-size: 0.5rem; color: #555;">УСЬОГО ЗАПИСІВ</p>
+            <h1 id="stat-total">0</h1>
         </div>
     </aside>
 </div>
 
-<div class="modal-overlay" id="modal-box">
-    <div class="modal-content">
-        <h2 style="margin-bottom: 20px; color: var(--primary);">НОВИЙ ЗАПИС</h2>
-        <select id="f-type" onchange="App.toggleExtra()">
-            <option value="news">📢 Новина</option>
-            <option value="update">✨ Оновлення</option>
-            <option value="project">🏗️ Проєкт</option>
-            <option value="idea">💡 Пропозиція</option>
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">СТВОРИТИ ЗАПИС</h2>
+        <select id="f-type" onchange="App.toggleFields()">
+            <option value="news">Новина</option>
+            <option value="update">Оновлення</option>
+            <option value="project">Проєкт</option>
         </select>
         <input type="text" id="f-title" placeholder="Заголовок">
-        <textarea id="f-desc" rows="4" placeholder="Ваше повідомлення..."></textarea>
-        
+        <textarea id="f-desc" rows="4" placeholder="Текст повідомлення..."></textarea>
         <div id="f-extra" style="display: none;">
-            <input type="number" id="f-prog" placeholder="Відсоток прогресу (0-100)">
-            <input type="text" id="f-coords" placeholder="Координати (напр. X: 100, Z: -200)">
+            <input type="number" id="f-prog" placeholder="Прогрес %">
+            <input type="text" id="f-coords" placeholder="Координати">
         </div>
-
-        <button class="btn-action" style="width: 100%;" onclick="App.publish()">ОПУБЛІКУВАТИ</button>
-        <button onclick="App.closeModal()" style="width: 100%; background: none; border: none; color: #444; margin-top: 15px; cursor: pointer; font-weight: 700;">СКАСУВАТИ</button>
+        <button class="btn" onclick="App.save()">ОПУБЛІКУВАТИ</button>
+        <button onclick="App.closeModal()" style="background:none; border:none; color:#444; width:100%; margin-top:10px; cursor:pointer;">Скасувати</button>
     </div>
 </div>
 
 <script>
 const App = {
-    key: 'whales_ultra_db',
+    dbKey: 'whales_local_storage',
     userKey: 'playerNick',
     currentTab: 'news',
-    allData: [],
+    data: [],
 
     init() {
-        // Налаштування профілю
         const nick = localStorage.getItem(this.userKey) || "Steve";
-        document.getElementById('p-name').innerText = nick;
-        document.getElementById('p-head').src = `https://mc-heads.net/avatar/${nick}/100`;
-
-        this.sync();
+        $('#p-name').text(nick);
+        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/40`);
+        
+        this.load();
+        this.startOnline();
     },
 
-    sync() {
-        // Локальні дані
-        const local = JSON.parse(localStorage.getItem(this.key) || "[]");
-        
-        // Офіційні дані (безпечна перевірка)
+    load() {
+        const local = JSON.parse(localStorage.getItem(this.dbKey) || "[]");
         let official = [];
-        if (window.WHALES_STORAGE && window.WHALES_STORAGE.posts) {
-            official = window.WHALES_STORAGE.posts;
+        
+        if (typeof WHALES_STORAGE !== 'undefined' && WHALES_STORAGE.posts) {
+            official = WHALES_STORAGE.posts;
+            console.log("✅ База news-data.js підключена");
         }
-
-        this.allData = [...local, ...official].sort((a, b) => b.id - a.id);
+        
+        this.data = [...local, ...official].sort((a, b) => b.id - a.id);
         this.render();
     },
 
-    render(filtered = null) {
-        const root = document.getElementById('feed-root');
-        root.innerHTML = '';
+    render(customData = null) {
+        const $feed = $('#feed');
+        $feed.empty();
+        const items = customData || this.data.filter(i => i.type === this.currentTab);
         
-        const source = filtered || this.allData.filter(item => item.type === this.currentTab);
-        document.getElementById('total-count').innerText = this.allData.length;
-
-        if (source.length === 0) {
-            root.innerHTML = `<div style="text-align:center; padding-top:100px; color:#222; font-weight:800; font-size:2rem; letter-spacing:10px;">EMPTY</div>`;
-            return;
-        }
-
-        source.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'post-card';
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-family:'JetBrains Mono'; font-size:0.7rem; color:#444;">
-                    <span style="color:var(--primary); font-weight:800;">#${item.type.toUpperCase()}</span>
-                    <span>${item.date} // ${item.author}</span>
-                </div>
-                <h2 style="margin-bottom:10px; font-size:1.4rem;">${item.title}</h2>
-                <p style="color:#888; line-height:1.6; font-size:0.9rem;">${item.desc.replace(/\n/g, '<br>')}</p>
-                
-                ${item.type === 'project' ? `
-                    <div style="margin-top:20px; background:rgba(0,0,0,0.3); padding:15px; border-radius:15px;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--primary); margin-bottom:8px;">
-                            <span>PROGRESS</span><span>${item.prog}%</span>
-                        </div>
-                        <div style="height:6px; background:#000; border-radius:10px; overflow:hidden;">
-                            <div style="width:${item.prog}%; height:100%; background:linear-gradient(90deg, var(--primary), var(--secondary)); shadow: 0 0 10px var(--primary);"></div>
-                        </div>
-                        <p style="font-size:0.65rem; color:#333; margin-top:10px; font-family:'JetBrains Mono';">LOC: ${item.coords}</p>
+        items.forEach(item => {
+            $feed.append(`
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span class="tag tag-${item.type}">${item.type}</span>
+                        <span style="font-size:0.6rem; color:#444;">${item.date} // ${item.author}</span>
                     </div>
-                ` : ''}
-            `;
-            root.appendChild(card);
+                    <h2>${item.title}</h2>
+                    <p style="color:#888; margin-top:10px;">${item.desc}</p>
+                    ${item.type === 'project' ? `<div style="margin-top:15px; font-size:0.7rem; color:var(--primary)">ПРОГРЕС: ${item.prog}% | ${item.coords}</div>` : ''}
+                </div>
+            `);
         });
+        $('#stat-total').text(this.data.length);
     },
 
-    publish() {
-        const title = document.getElementById('f-title').value;
-        const desc = document.getElementById('f-desc').value;
-        
-        if (!title || !desc) return alert("Заповніть всі поля!");
+    save() {
+        const title = $('#f-title').val();
+        const desc = $('#f-desc').val();
+        if(!title || !desc) return Swal.fire('Помилка', 'Заповніть поля!', 'error');
 
-        const newPost = {
+        const post = {
             id: Date.now(),
-            author: document.getElementById('p-name').innerText,
-            type: document.getElementById('f-type').value,
+            author: $('#p-name').text(),
+            type: $('#f-type').val(),
             title, desc,
-            prog: document.getElementById('f-prog').value || 0,
-            coords: document.getElementById('f-coords').value || "Unknown",
+            prog: $('#f-prog').val() || 0,
+            coords: $('#f-coords').val() || "Немає",
             date: new Date().toLocaleDateString('uk-UA')
         };
 
-        const local = JSON.parse(localStorage.getItem(this.key) || "[]");
-        local.unshift(newPost);
-        localStorage.setItem(this.key, JSON.stringify(local));
+        const local = JSON.parse(localStorage.getItem(this.dbKey) || "[]");
+        local.unshift(post);
+        localStorage.setItem(this.dbKey, JSON.stringify(local));
 
-        // Очищення та оновлення
-        document.getElementById('f-title').value = '';
-        document.getElementById('f-desc').value = '';
-        this.sync();
+        confetti({ particleCount: 150, spread: 60, origin: { y: 0.7 } });
+        Swal.fire({ title: 'Готово!', icon: 'success', background: '#0a0a15', color: '#fff' });
+
+        this.load();
         this.closeModal();
+        $('#f-title, #f-desc').val('');
     },
 
-    search(val) {
-        const query = val.toLowerCase();
-        const filtered = this.allData.filter(i => 
-            i.type === this.currentTab && 
-            (i.title.toLowerCase().includes(query) || i.desc.toLowerCase().includes(query))
+    search(q) {
+        const filtered = this.data.filter(i => 
+            i.type === this.currentTab && i.title.toLowerCase().includes(q.toLowerCase())
         );
         this.render(filtered);
     },
 
-    tab(type, el) {
-        this.currentTab = type;
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
+    setTab(t, el) {
+        this.currentTab = t;
+        $('.nav-item').removeClass('active');
+        $(el).addClass('active');
         this.render();
     },
 
-    openModal() { document.getElementById('modal-box').style.display = 'flex'; },
-    closeModal() { document.getElementById('modal-box').style.display = 'none'; },
-    toggleExtra() { document.getElementById('f-extra').style.display = document.getElementById('f-type').value === 'project' ? 'block' : 'none'; }
+    startOnline() {
+        setInterval(() => {
+            $('#p-online').text(`ONLINE: ${Math.floor(Math.random() * 5) + 15}/100`);
+        }, 5000);
+    },
+
+    openModal() { $('#modal').fadeIn().css('display', 'flex'); },
+    closeModal() { $('#modal').fadeOut(); },
+    toggleFields() { $('#f-extra').toggle($('#f-type').val() === 'project'); },
+    logout() { localStorage.removeItem(this.userKey); window.location.href = 'index.html'; }
 };
 
-window.onload = () => App.init();
+$(window).on('load', () => App.init());
 </script>
-
 </body>
 </html>
