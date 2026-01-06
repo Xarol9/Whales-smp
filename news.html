@@ -3,177 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES | APEX TERMINAL v3.0</title>
+    <title>WHALES | QUANTUM CORE v4.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@200;400;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
-            --neon: #00f2ff;
-            --neon-glow: rgba(0, 242, 255, 0.4);
-            --void: #010103;
-            --panel-bg: rgba(8, 8, 15, 0.85);
-            --border: rgba(0, 242, 255, 0.2);
-            --magenta: #ff0055;
+            --q-cyan: #00f2ff;
+            --q-magenta: #bc00ff;
+            --q-blue: #0044ff;
+            --q-void: #000205;
+            --q-border: rgba(0, 242, 255, 0.2);
+            --q-glass: rgba(0, 5, 15, 0.8);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
         
         body { 
-            background: var(--void);
+            background: var(--q-void);
             color: #fff;
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Exo 2', sans-serif;
             height: 100vh;
             overflow: hidden;
-            perspective: 1000px;
+            perspective: 2000px;
         }
 
-        /* Кастомний курсор-приціл */
-        #cursor {
-            width: 20px; height: 20px; border: 1px solid var(--neon);
+        /* Динамічний Canvas Фон */
+        #canvas-bg { position: fixed; inset: 0; z-index: -2; background: #000; }
+
+        /* Кастомний лазерний курсор */
+        #cursor-laser {
+            width: 40px; height: 40px; border: 1px solid var(--q-cyan);
             position: fixed; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); transition: transform 0.1s ease;
-            border-radius: 50%; box-shadow: 0 0 10px var(--neon);
+            transform: translate(-50%, -50%); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
+        #cursor-laser::after { content: ''; width: 4px; height: 4px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px var(--q-cyan); }
 
-        /* Гексагональна сітка */
-        .bg-overlay {
-            position: fixed; inset: 0; z-index: -1;
-            background: 
-                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05), transparent),
-                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-            opacity: 0.3;
+        /* Ефекти шарів */
+        .overlay-scan {
+            position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
         }
-
-        /* Лінія сканування */
-        .scanline {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(0, 242, 255, 0.05) 50%, transparent);
-            background-size: 100% 4px; z-index: 100; pointer-events: none;
-            animation: scan 4s linear infinite;
-        }
-        @keyframes scan { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
 
         header {
-            height: 110px; padding: 0 80px;
+            height: 120px; padding: 0 100px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid var(--border);
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(30px);
-            clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
+            background: var(--q-glass); backdrop-filter: blur(40px);
+            border-bottom: 1px solid var(--q-border);
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 5% 100%, 0 70%);
         }
 
-        .brand { display: flex; align-items: center; gap: 30px; }
-        .brand h1 {
-            font-family: 'Syncopate', sans-serif; font-size: 1.5rem; letter-spacing: 12px;
-            text-transform: uppercase; color: var(--neon); text-shadow: 0 0 20px var(--neon-glow);
+        .sys-title {
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2rem;
+            letter-spacing: 15px; color: #fff; text-shadow: 0 0 30px var(--q-cyan);
         }
 
         .wrapper {
-            display: grid; grid-template-columns: 340px 1fr 340px;
-            height: calc(100vh - 110px); padding: 40px; gap: 40px;
+            display: grid; grid-template-columns: 360px 1fr 360px;
+            height: calc(100vh - 120px); padding: 50px; gap: 50px;
         }
 
-        .terminal-panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            position: relative; padding: 40px;
-            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.05);
+        /* Паралакс Панель */
+        .parallax-panel {
+            background: var(--q-glass); border: 1px solid var(--q-border);
+            border-radius: 15px; padding: 40px;
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
             display: flex; flex-direction: column;
-        }
-
-        /* Кутові рамки */
-        .terminal-panel::before {
-            content: ""; position: absolute; top: -2px; left: -2px; width: 30px; height: 30px;
-            border-top: 3px solid var(--neon); border-left: 3px solid var(--neon);
-        }
-        .terminal-panel::after {
-            content: ""; position: absolute; bottom: -2px; right: -2px; width: 30px; height: 30px;
-            border-bottom: 3px solid var(--neon); border-right: 3px solid var(--neon);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
         .nav-link {
-            padding: 22px; margin-bottom: 15px; font-family: 'JetBrains Mono';
-            font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.4);
-            border-left: 2px solid transparent; transition: 0.4s;
+            padding: 25px; margin-bottom: 15px; border-radius: 5px;
+            font-family: 'Fira Code', monospace; font-size: 0.9rem;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent;
+            transition: 0.3s; color: rgba(255,255,255,0.5);
         }
-        .nav-link:hover { color: var(--neon); background: rgba(0,242,255,0.05); padding-left: 35px; }
+        .nav-link:hover { background: rgba(0,242,255,0.05); color: #fff; transform: translateZ(20px); }
         .nav-link.active {
-            color: var(--neon); border-left: 4px solid var(--neon);
-            background: linear-gradient(90deg, rgba(0,242,255,0.1), transparent);
+            border-color: var(--q-cyan); color: var(--q-cyan);
+            background: radial-gradient(circle at left, rgba(0,242,255,0.1), transparent);
+            box-shadow: -10px 0 20px rgba(0,242,255,0.1);
         }
 
-        .feed { overflow-y: auto; padding-right: 20px; scroll-behavior: smooth; }
-        .feed::-webkit-scrollbar { width: 2px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--neon); }
+        .feed { overflow-y: auto; padding-right: 25px; perspective: 1000px; }
+        .feed::-webkit-scrollbar { width: 1px; }
 
-        .article {
-            background: rgba(255,255,255,0.02); border-radius: 4px;
-            padding: 50px; border-left: 1px solid var(--border);
-            margin-bottom: 50px; position: relative;
-            animation: emerge 0.8s cubic-bezier(0, 1, 0, 1);
+        .quantum-card {
+            background: rgba(255,255,255,0.01); border: 1px solid var(--q-border);
+            padding: 60px; margin-bottom: 60px; position: relative;
+            transform: translateZ(0); transition: 0.5s;
         }
-        @keyframes emerge { from { opacity: 0; transform: scale(0.95) rotateX(10deg); } to { opacity: 1; transform: scale(1) rotateX(0); } }
+        .quantum-card:hover { background: rgba(255,255,255,0.03); transform: translateZ(30px); border-color: #fff; }
 
-        .article h2 { font-family: 'Syncopate', sans-serif; font-size: 1.8rem; margin-bottom: 20px; color: #fff; }
-        .article p { color: rgba(255,255,255,0.5); line-height: 2; font-size: 1.1rem; }
-
-        .exit-cmd {
-            margin-top: auto; border: 1px solid var(--magenta); background: transparent;
-            color: var(--magenta); padding: 25px; font-family: 'JetBrains Mono';
-            font-weight: 700; letter-spacing: 4px; transition: 0.3s;
+        .quantum-card::before {
+            content: "SECURED_DATA"; position: absolute; top: 10px; right: 20px;
+            font-size: 0.5rem; color: var(--q-cyan); opacity: 0.4; font-family: 'Fira Code';
         }
-        .exit-cmd:hover { background: var(--magenta); color: #fff; box-shadow: 0 0 30px var(--magenta); }
 
-        .stat-block { margin-bottom: 40px; }
-        .stat-label { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--neon); opacity: 0.6; }
-        .stat-num { font-size: 5rem; font-weight: 300; line-height: 1; letter-spacing: -5px; color: #fff; }
+        .quantum-card h2 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; margin-bottom: 25px; font-weight: 700; }
+        .quantum-card p { color: rgba(255,255,255,0.7); line-height: 2.2; font-size: 1.1rem; font-weight: 300; }
 
-        .profile-hex {
-            display: flex; align-items: center; gap: 20px;
-            padding: 10px 25px; background: rgba(0,242,255,0.05);
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        .exit-sequence {
+            margin-top: auto; padding: 25px; border: 1px solid #ff0044;
+            background: transparent; color: #ff0044; font-family: 'Orbitron';
+            font-size: 0.8rem; font-weight: 700; letter-spacing: 5px;
+            transition: 0.4s; overflow: hidden; position: relative;
+        }
+        .exit-sequence:hover { background: #ff0044; color: #fff; box-shadow: 0 0 40px #ff0044; }
+
+        .stat-circle {
+            width: 180px; height: 180px; border-radius: 50%;
+            border: 2px solid var(--q-border); margin: 0 auto 30px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .stat-circle::after {
+            content: ''; position: absolute; inset: -10px; border: 1px dashed var(--q-cyan);
+            border-radius: 50%; animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .profile-wrap {
+            display: flex; align-items: center; gap: 25px;
+            padding: 10px 40px; background: rgba(0,0,0,0.6);
+            border: 1px solid var(--q-border); border-radius: 100px;
         }
     </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div class="bg-overlay"></div>
-<div class="scanline"></div>
+<canvas id="canvas-bg"></canvas>
+<div id="cursor-laser"></div>
+<div class="overlay-scan"></div>
 
 <script src="news-data.js"></script>
 
 <header>
-    <div class="brand">
-        <i class="fa-solid fa-ghost" style="color: var(--neon); font-size: 1.5rem;"></i>
-        <h1>WHALES_APEX</h1>
-    </div>
+    <div class="sys-title">WHALES.CORE</div>
     
-    <div class="profile-hex">
+    <div class="profile-wrap">
         <div style="text-align: right;">
-            <p id="p-name" style="font-weight: 800; letter-spacing: 2px;">GHOST_USER</p>
-            <p style="font-size: 0.5rem; color: var(--neon); font-family: 'JetBrains Mono';">LEVEL: 01 // SECTOR: 7</p>
+            <p id="p-name" style="font-family: 'Orbitron'; font-weight: 700; letter-spacing: 2px; color: var(--q-cyan);">ROOT_USER</p>
+            <p style="font-size: 0.6rem; color: #fff; opacity: 0.5;">MEMETIC_LINK: ACTIVE</p>
         </div>
-        <img id="p-head" src="" style="width: 45px; height: 45px; border-radius: 4px;">
+        <img id="p-head" src="" style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--q-cyan);">
     </div>
 </header>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <div class="terminal-panel" style="height: 100%;">
-            <span class="stat-label">// NAVIGATION_CORE</span>
-            <div style="margin-top: 30px;">
-                <div class="nav-link active" onclick="App.setTab('news', this)">01. GLOBAL_FEED</div>
-                <div class="nav-link" onclick="App.setTab('update', this)">02. SYSTEM_PATCHES</div>
-                <div class="nav-link" onclick="App.setTab('project', this)">03. ARCHITECTURE</div>
-            </div>
+        <div class="parallax-panel" id="left-panel">
+            <p style="font-family: 'Fira Code'; font-size: 0.6rem; color: var(--q-cyan); margin-bottom: 30px;">// SYSTEM_INTERFACE</p>
+            <div class="nav-link active" onclick="App.setTab('news', this)">[ 01 ] NEURAL_FEED</div>
+            <div class="nav-link" onclick="App.setTab('update', this)">[ 02 ] KERNEL_PATCH</div>
+            <div class="nav-link" onclick="App.setTab('project', this)">[ 03 ] MEGACYCLE_LOG</div>
 
-            <button class="exit-cmd" onclick="App.logout()">
-                > TERMINATE_CONNECTION
+            <button class="exit-sequence" onclick="App.logout()">
+                TERMINATE_LINK
             </button>
         </div>
     </aside>
@@ -181,37 +173,74 @@
     <main class="feed" id="feed"></main>
 
     <aside class="sidebar">
-        <div class="terminal-panel">
-            <span class="stat-label">// DATA_METRICS</span>
-            <div class="stat-block">
-                <h1 class="stat-num" id="stat-total">0</h1>
-                <p style="font-size: 0.7rem; color: rgba(255,255,255,0.2);">AVAILABLE_RECORDS</p>
+        <div class="parallax-panel" id="right-panel">
+            <p style="font-family: 'Fira Code'; font-size: 0.6rem; color: var(--q-cyan); margin-bottom: 30px;">// CORE_METRICS</p>
+            
+            <div class="stat-circle">
+                <span style="font-size: 0.7rem; color: var(--q-cyan);">INDEX_COUNT</span>
+                <h1 id="stat-total" style="font-size: 3.5rem; font-family: 'Orbitron';">00</h1>
             </div>
 
-            <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 4px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span class="stat-label">STABILITY:</span><span style="color:var(--neon)">99%</span>
-                </div>
-                <div style="height: 2px; background: rgba(0,242,255,0.1);">
-                    <div style="width: 99%; height: 100%; background: var(--neon);"></div>
-                </div>
+            <div style="background: rgba(0,242,255,0.03); padding: 30px; border-radius: 10px; border-left: 3px solid var(--q-cyan);">
+                <p style="font-size: 0.8rem; line-height: 1.8; font-family: 'Fira Code'; color: rgba(255,255,255,0.6);">
+                    LOG: Систему синхронізовано з хмарою. Затримка 2ms. Всі квантові вузли в стані когерентності.
+                </p>
             </div>
-        </div>
-
-        <div class="terminal-panel" style="margin-top: 40px; border-color: rgba(255,255,255,0.05);">
-            <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono';">
-                LOG: Соединение установлено через порт 8080. Все протоколы защиты активны. Ожидание команд пользователя...
-            </p>
         </div>
     </aside>
 </div>
 
 <script>
-// Слідкування курсора
+// Canvas Нейронний Фон
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+let points = [];
+
+function initCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    points = [];
+    for(let i=0; i<80; i++) points.push({
+        x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+        vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5
+    });
+}
+
+function drawCanvas() {
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0, 242, 255, 0.5)";
+    ctx.strokeStyle = "rgba(0, 242, 255, 0.05)";
+    points.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+        if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
+        for(let j=i+1; j<points.length; j++) {
+            let p2 = points[j];
+            let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+            if(dist < 200) {
+                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+            }
+        }
+    });
+    requestAnimationFrame(drawCanvas);
+}
+
+// Паралакс та Курсор
 document.addEventListener('mousemove', e => {
-    document.getElementById('cursor').style.left = e.clientX + 'px';
-    document.getElementById('cursor').style.top = e.clientY + 'px';
+    const laser = document.getElementById('cursor-laser');
+    laser.style.left = e.clientX + 'px';
+    laser.style.top = e.clientY + 'px';
+
+    const xAxis = (window.innerWidth / 2 - e.clientX) / 50;
+    const yAxis = (window.innerHeight / 2 - e.clientY) / 50;
+    
+    document.getElementById('left-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+    document.getElementById('right-panel').style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
 });
+
+window.addEventListener('resize', initCanvas);
+initCanvas(); drawCanvas();
 
 const App = {
     currentTab: 'news',
@@ -220,7 +249,7 @@ const App = {
     init() {
         const nick = localStorage.getItem('playerNick') || "Steve";
         $('#p-name').text(nick.toUpperCase());
-        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/100`);
+        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/120`);
         this.load();
     },
 
@@ -238,19 +267,19 @@ const App = {
         
         items.forEach((item, index) => {
             $feed.append(`
-                <div class="article" style="animation-delay: ${index * 0.1}s">
-                    <div style="font-family:'JetBrains Mono'; color:var(--neon); font-size:0.7rem; margin-bottom:15px;">
-                        [ TYPE: ${item.type} // DATE: ${item.date} ]
-                    </div>
-                    <h2>${item.title}</h2>
-                    <p>${item.desc}</p>
+                <div class="quantum-card" style="animation: slideIn 0.8s ${index * 0.1}s cubic-bezier(0,1,0,1) forwards; opacity:0;">
+                    <span style="font-family:'Fira Code'; color:var(--q-cyan); font-size:0.7rem; letter-spacing:3px;">
+                        // ENTITY_TYPE: ${item.type.toUpperCase()} // TIMESTAMP: ${item.date}
+                    </span>
+                    <h2 style="margin-top:20px; text-shadow: 0 0 20px rgba(255,255,255,0.2);">${item.title}</h2>
+                    <p style="margin-top:20px;">${item.desc}</p>
                     ${item.type === 'project' ? `
-                        <div style="margin-top:35px;">
-                            <div style="display:flex; justify-content:space-between; font-size:0.6rem; margin-bottom:10px;">
-                                <span>BUILDING_STATE</span><span>${item.prog}%</span>
+                        <div style="margin-top:40px; padding:30px; background:rgba(255,255,255,0.02); border-radius:5px;">
+                            <div style="display:flex; justify-content:space-between; font-family:'Orbitron'; font-size:0.6rem; margin-bottom:15px; color:var(--q-cyan);">
+                                <span>CONSTRUCTION_INTEGRITY</span><span>${item.prog}%</span>
                             </div>
-                            <div style="height:2px; background:rgba(255,255,255,0.05);">
-                                <div style="width:${item.prog}%; height:100%; background:var(--neon); box-shadow:0 0 15px var(--neon);"></div>
+                            <div style="height:1px; background:rgba(255,255,255,0.1);">
+                                <div style="width:${item.prog}%; height:100%; background:var(--q-cyan); box-shadow:0 0 15px var(--q-cyan);"></div>
                             </div>
                         </div>
                     ` : ''}
@@ -269,22 +298,23 @@ const App = {
 
     logout() {
         Swal.fire({
-            title: 'TERMINATE?',
-            text: "Розірвати захищений зв'язок?",
+            title: 'TERMINATE LINK?',
+            text: "Розірвати нейронний зв'язок з ядром?",
             icon: 'warning',
-            background: '#010103',
+            background: '#00050f',
             color: '#fff',
             showCancelButton: true,
-            confirmButtonColor: '#ff0055',
-            confirmButtonText: 'EXIT',
-            cancelButtonText: 'STAY'
+            confirmButtonColor: '#ff0044',
+            confirmButtonText: 'DISCONNECT',
+            cancelButtonText: 'MAINTAIN'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.body.style.opacity = '0';
+                document.body.style.filter = 'blur(20px) brightness(0)';
+                document.body.style.transition = '1s';
                 setTimeout(() => {
                     localStorage.removeItem('playerNick');
                     window.location.href = 'index.html';
-                }, 500);
+                }, 1000);
             }
         });
     }
@@ -292,5 +322,9 @@ const App = {
 
 $(window).on('load', () => App.init());
 </script>
+
+<style>
+@keyframes slideIn { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+</style>
 </body>
 </html>
