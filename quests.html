@@ -3,238 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whales SMP | Біржа замовлень</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>ALE | QUANTUM LABOR TERMINAL</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
-        :root { 
-            --accent: #00d2ff; 
-            --bg: #050608; 
-            --card: rgba(20, 22, 28, 0.6); 
-            --border: rgba(255, 255, 255, 0.08); 
+        :root {
+            --neon: #00f2ff;
+            --neon-bg: rgba(0, 242, 255, 0.05);
+            --gold: #ffcc00;
+            --bg-void: #010204;
+            --panel-glass: rgba(10, 12, 18, 0.9);
+            --border-line: rgba(0, 242, 255, 0.2);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        
         body { 
-            margin: 0; background: var(--bg); color: white; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-image: radial-gradient(circle at 50% -20%, #1a2a3a 0%, #050608 60%);
-            min-height: 100vh;
+            background: var(--bg-void); color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            height: 100vh; overflow: hidden;
         }
 
-        /* --- NAVIGATION --- */
-        nav {
+        /* Лазерний курсор */
+        #cursor {
+            width: 30px; height: 30px; border: 1px solid var(--neon);
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #cursor::after { content: ''; width: 2px; height: 2px; background: #fff; box-shadow: 0 0 10px var(--neon); }
+
+        /* Фонова сітка */
+        .grid-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image: linear-gradient(var(--border-line) 1px, transparent 1px), linear-gradient(90deg, var(--border-line) 1px, transparent 1px);
+            background-size: 100px 100px; mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
+            opacity: 0.1;
+        }
+
+        /* Header / Sync Bar */
+        .sync-header {
+            height: 80px; padding: 0 60px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 1000;
-        }
-        .nav-brand { font-weight: 800; font-size: 1.5rem; color: var(--accent); letter-spacing: -1px; text-decoration: none; }
-        .nav-links { display: flex; gap: 10px; }
-        .nav-links a { color: #aaa; text-decoration: none; font-size: 0.85rem; padding: 10px 15px; border-radius: 12px; transition: 0.3s; }
-        .nav-links a:hover { color: white; background: rgba(255,255,255,0.05); }
-        
-        .profile-btn {
-            display: flex; align-items: center; gap: 10px; background: var(--card);
-            padding: 6px 15px; border-radius: 50px; border: 1px solid var(--border);
-            text-decoration: none; color: white; font-size: 0.9rem;
+            background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border-line);
         }
 
-        /* --- CONTENT --- */
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .sync-status { display: flex; align-items: center; gap: 15px; font-size: 0.6rem; letter-spacing: 2px; }
+        .sync-dot { width: 8px; height: 8px; background: var(--neon); border-radius: 50%; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; box-shadow: 0 0 10px var(--neon); } 100% { opacity: 0.2; } }
 
-        .header-section {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            margin-bottom: 30px;
+        .brand-logo { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; letter-spacing: 15px; }
+
+        .main-layout {
+            display: grid; grid-template-columns: 350px 1fr 350px;
+            height: calc(100vh - 80px); padding: 40px; gap: 40px;
         }
-        .header-section h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
 
-        .btn-add {
-            background: var(--accent); color: black; border: none;
-            padding: 14px 25px; border-radius: 16px; font-weight: 800;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 20px rgba(0,210,255,0.2);
+        .terminal-panel {
+            background: var(--panel-glass); border: 1px solid var(--border-line);
+            padding: 30px; display: flex; flex-direction: column; position: relative;
+            backdrop-filter: blur(20px);
         }
-        .btn-add:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,210,255,0.4); }
 
-        /* --- QUEST CARDS --- */
-        .quest-list { display: flex; flex-direction: column; gap: 20px; }
-        
-        .quest-card {
-            background: var(--card); border: 1px solid var(--border);
-            padding: 25px; border-radius: 28px; backdrop-filter: blur(10px);
-            display: grid; grid-template-columns: auto 1fr auto; gap: 25px; align-items: center;
+        .category-btn {
+            padding: 20px; border-left: 2px solid transparent;
+            margin-bottom: 15px; font-size: 0.75rem; color: rgba(255,255,255,0.4);
             transition: 0.3s;
         }
-        .quest-card:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+        .category-btn:hover { background: var(--neon-bg); color: #fff; padding-left: 30px; }
+        .category-btn.active { border-color: var(--neon); color: var(--neon); background: var(--neon-bg); }
 
-        .author-info { text-align: center; border-right: 1px solid var(--border); padding-right: 25px; min-width: 80px; }
-        .author-head { width: 50px; height: 50px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .author-name { font-size: 0.75rem; color: #777; font-weight: 600; display: block; }
+        /* Картки Біржі */
+        .job-feed { overflow-y: auto; padding-right: 20px; }
+        .job-feed::-webkit-scrollbar { width: 2px; }
+        .job-feed::-webkit-scrollbar-thumb { background: var(--neon); }
 
-        .quest-main h3 { margin: 0 0 8px 0; font-size: 1.3rem; color: white; }
-        .quest-main p { margin: 0; color: #999; font-size: 0.95rem; line-height: 1.5; }
-
-        .reward-box { text-align: right; }
-        .reward-label { font-size: 0.65rem; color: #555; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .reward-val { background: rgba(0,210,255,0.1); color: var(--accent); padding: 10px 18px; border-radius: 14px; font-weight: 800; display: inline-block; }
-
-        /* --- MODAL --- */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);z-index: 2000; align-items: center; justify-content: center;
+        .job-card {
+            border: 1px solid var(--border-line); padding: 40px;
+            margin-bottom: 30px; position: relative; transition: 0.4s;
+            background: linear-gradient(135deg, rgba(255,255,255,0.01), transparent);
         }
-        .modal-box { 
-            background: #111218; border: 1px solid var(--border); 
-            padding: 40px; border-radius: 35px; width: 100%; max-width: 450px;
+        .job-card:hover { border-color: var(--neon); box-shadow: 0 0 30px var(--neon-bg); transform: translateY(-5px); }
+
+        .job-id { font-size: 0.6rem; color: var(--neon); margin-bottom: 10px; display: block; }
+        .job-card h2 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 15px; }
+        .job-card p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.8; }
+
+        .job-footer {
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-line);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .modal-box h2 { margin-top: 0; font-size: 1.8rem; margin-bottom: 25px; }
 
-        input, textarea {
-            width: 100%; background: #08090b; border: 1px solid var(--border);
-            color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px;
-            box-sizing: border-box; font-family: inherit; font-size: 0.95rem;
+        .salary { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+
+        .nexus-btn {
+            margin-top: auto; padding: 20px; border: 1px solid var(--neon);
+            text-align: center; color: var(--neon); font-family: 'Syncopate';
+            font-size: 0.6rem; letter-spacing: 5px; text-decoration: none; transition: 0.4s;
         }
-        input:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        .nexus-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 40px var(--neon); }
 
-        .btn-submit { width: 100%; background: var(--accent); color: black; border: none; padding: 18px; border-radius: 15px; font-weight: 800; cursor: pointer; }
-        .btn-cancel { width: 100%; background: none; color: #555; border: none; margin-top: 15px; cursor: pointer; font-weight: 600; }
-
-        /* --- EMPTY STATE --- */
-        .empty-msg { text-align: center; padding: 60px; color: #444; font-style: italic; }
+        .stat-box { margin-bottom: 40px; }
+        .stat-val { font-size: 4rem; font-family: 'Orbitron'; line-height: 1; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-<nav>
-    <a href="index.html" class="nav-brand">WHALES.</a>
-    <div class="nav-links">
-        <a href="index.html">Головна</a>
-        <a href="news.html">Новини</a>
-        <a href="wiki.html">Вікі</a>
-        <a href="quests.html" style="color: white; font-weight: 800;">Біржа</a>
-        <a href="shop.html">Магазин</a>
-    </div>
-    <a href="profile.html" class="profile-btn">
-        <img id="p-head" src="" style="width: 24px; height: 24px; border-radius: 6px;">
-        <span id="p-nick">...</span>
-    </a>
-</nav>
+<div id="cursor"></div>
+<div class="grid-bg"></div>
 
-<div class="container">
-    <div class="header-section">
-        <div>
-            <h1>Біржа праці</h1>
-            <p style="color: #666; margin: 5px 0 0 0;">Допомагай іншим та заробляй ресурси</p>
-        </div>
-        <button class="btn-add" onclick="toggleModal(true)">+ НОВЕ ЗАМОВЛЕННЯ</button>
+<header class="sync-header">
+    <div class="sync-status">
+        <div class="sync-dot"></div>
+        <span>QUANTUM_SYNC: <span id="sync-text">ESTABLISHING...</span></span>
     </div>
+    <div class="brand-logo">ALE_SYSTEM</div>
+    <div style="font-size: 0.6rem; color: var(--neon);">v5.0.2 // ARCH: X64</div>
+</header>
 
-    <div class="quest-list" id="q-container">
-        <div class="quest-card">
-            <div class="author-info">
-                <img src="https://mc-heads.net/avatar/Steve/50" class="author-head">
-                <span class="author-name">Steve</span>
-            </div>
-            <div class="quest-main">
-                <h3>Потрібен декор для спавну</h3>
-                <p>Шукаю будівельника, який вміє гарно працювати з листям та деревом. Матеріали надаю.</p>
-            </div>
-            <div class="reward-box">
-                <span class="reward-label">Нагорода</span>
-                <div class="reward-val">💎 32 Алмази</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="modal-wrap">
-    <div class="modal-box">
-        <h2>Створити замовлення</h2>
-        <input type="text" id="in-title" placeholder="Що потрібно зробити?">
-        <textarea id="in-desc" rows="4" placeholder="Деталі, координати, терміни..."></textarea>
-        <input type="text" id="in-reward" placeholder="Нагорода (напр. 5000$ або Шалкер)">
+<div class="main-layout">
+    <aside class="terminal-panel">
+        <p style="font-size: 0.5rem; color: var(--neon); margin-bottom: 30px; opacity: 0.6;">// SELECT_SECTOR</p>
+        <div class="category-btn active" onclick="App.setTab('news', this)">01. GLOBAL_BOARD</div>
+        <div class="category-btn" onclick="App.setTab('update', this)">02. SYSTEM_TASKS</div>
+        <div class="category-btn" onclick="App.setTab('project', this)">03. ARCHITECT_LIST</div>
         
-        <button class="btn-submit" onclick="submitQuest()">ОПУБЛІКУВАТИ</button>
-        <button class="btn-cancel" onclick="toggleModal(false)">Скасувати</button>
-    </div>
+        <a href="index.html" class="nexus-btn">EXIT_TO_NEXUS</a>
+    </aside>
+
+    <main class="job-feed" id="feed"></main>
+
+    <aside class="terminal-panel">
+        <p style="font-size: 0.5rem; color: var(--neon); margin-bottom: 30px; opacity: 0.6;">// USER_METRICS</p>
+        
+        <div class="stat-box">
+            <span style="font-size: 0.6rem; color: rgba(255,255,255,0.4);">ACTIVE_OFFERS</span>
+            <div class="stat-val" id="stat-total">00</div>
+        </div>
+
+        <div style="border: 1px solid var(--border-line); padding: 25px; margin-top: auto; display: flex; align-items: center; gap: 20px;">
+            <img id="p-head" src="" style="width: 45px; height: 45px; border: 1px solid var(--neon);">
+            <div>
+                <p id="p-name" style="font-size: 0.8rem; font-weight: 700; color: #fff;">USER</p>
+                <p style="font-size: 0.5rem; color: var(--neon); opacity: 0.7;">RANK: APPRENTICE</p>
+            </div>
+        </div>
+    </aside>
 </div>
 
+<script src="news-data.js"></script>
 <script>
-    // 1. АВТОРИЗАЦІЯ
-    const myNick = localStorage.getItem('playerNick') || "Гість";
-    document.getElementById('p-nick').innerText = myNick;
-    document.getElementById('p-head').src = "https://mc-heads.net/avatar/" + myNick + "/24";
+// Керування курсором
+document.addEventListener('mousemove', e => {
+    document.getElementById('cursor').style.left = e.clientX + 'px';
+    document.getElementById('cursor').style.top = e.clientY + 'px';
+});
 
-    // 2. УПРАВЛІННЯ МОДАЛКОЮ
-    function toggleModal(show) {
-        document.getElementById('modal-wrap').style.display = show ? 'flex' : 'none';
-    }
+const App = {
+    currentTab: 'news',
+    data: [],
 
-    // 3. ДОДАВАННЯ КВЕСТУ
-    async function submitQuest() {
-        const title = document.getElementById('in-title').value.trim();
-        const desc = document.getElementById('in-desc').value.trim();
-        const reward = document.getElementById('in-reward').value.trim();
-        const btn = document.querySelector('.btn-submit');
-
-        if (!title || !desc || !reward) {
-            alert("Заповніть усі поля форми!");return;
-        }
-
-        btn.disabled = true;
-        btn.innerText = "ОБРОБКА...";
-
-        // Додаємо візуально на сторінку
-        const container = document.getElementById('q-container');
-        const card = document.createElement('div');
-        card.className = 'quest-card';
-        card.innerHTML = `
-            <div class="author-info">
-                <img src="https://mc-heads.net/avatar/${myNick}/50" class="author-head">
-                <span class="author-name">${myNick}</span>
-            </div>
-            <div class="quest-main">
-                <h3>${title}</h3>
-                <p>${desc}</p>
-            </div>
-            <div class="reward-box">
-                <span class="reward-label">Нагорода</span>
-                <div class="reward-val">${reward}</div>
-            </div>
-        `;
+    init() {
+        const nick = localStorage.getItem('playerNick') || "Steve";
+        $('#p-name').text(nick.toUpperCase());
+        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/64`);
         
-        container.prepend(card);
+        // Симуляція синхронізації
+        setTimeout(() => {
+            $('#sync-text').text('CONNECTED').css('color', 'var(--neon)');
+            this.load();
+        }, 1500);
+    },
 
-        // ВІДПРАВКА В DISCORD
-        const webhook = "ТУТ_ТВІЙ_WEBHOOK"; // ВСТАВ СВІЙ ЛІНК!
-
-        try {
-            await fetch(webhook, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: "Whales Board",
-                    embeds: [{
-                        title: "🛠️ Нове замовлення: " + title,
-                        description: desc + "\n\n**Нагорода:** " + reward,
-                        color: 54103,
-                        footer: { text: "Замовник: " + myNick },
-                        thumbnail: { url: "https://mc-heads.net/avatar/" + myNick + "/100" }
-                    }]
-                })
-            });
-            alert("Замовлення успішно опубліковано на сайті та в Discord!");
-        } catch (e) {
-            console.error(e);
+    load() {
+        if (window.WHALES_STORAGE && window.WHALES_STORAGE.posts) {
+            this.data = window.WHALES_STORAGE.posts;
         }
+        this.render();
+    },
 
-        // Очищення та закриття
-        document.getElementById('in-title').value = "";
-        document.getElementById('in-desc').value = "";
-        document.getElementById('in-reward').value = "";
-        btn.disabled = false;
-        btn.innerText = "ОПУБЛІКУВАТИ";
-        toggleModal(false);
+    render() {
+        const $feed = $('#feed');
+        $feed.empty();
+        const items = this.data.filter(i => i.type === this.currentTab);
+        
+        items.forEach((item, index) => {
+            $feed.append(`
+                <div class="job-card" style="animation: slide 0.6s ${index * 0.1}s cubic-bezier(0,1,0,1) forwards; opacity:0;">
+                    <span class="job-id">ORDER_ID: #${item.id}</span>
+                    <h2>${item.title.toUpperCase()}</h2>
+                    <p>${item.desc}</p>
+                    
+                    <div class="job-footer">
+                        <span class="salary"><i class="fa-solid fa-coins" style="margin-right:10px;"></i> REWARD: ${Math.floor(Math.random()*1000 + 500)} Credits</span>
+                        <span style="font-size: 0.6rem; color: rgba(255,255,255,0.3); font-family: 'JetBrains Mono';">DATE: ${item.date}</span>
+                    </div>
+                    
+                    ${item.type === 'project' ? `
+                        <div style="margin-top:20px;">
+                            <div style="height:1px; background:var(--border-line); position:relative;">
+                                <div style="width:${item.prog}%; height:100%; background:var(--neon); box-shadow:0 0 10px var(--neon);"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+        });
+        $('#stat-total').text(this.data.length < 10 ? '0' + this.data.length : this.data.length);
+    },
+
+    setTab(t, el) {
+        this.currentTab = t;
+        $('.category-btn').removeClass('active');
+        $(el).addClass('active');
+        this.render();
     }
+};
+
+$(window).on('load', () => App.init());
 </script>
 
+<style>
+@keyframes slide { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+</style>
 </body>
 </html>
