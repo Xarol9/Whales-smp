@@ -3,36 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES HUB | СИСТЕМА</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>WHALES HUB | ULTRA EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #00f2ff; --secondary: #7000ff; --danger: #ff2a6d;
-            --bg: #05050a; --panel: rgba(15, 15, 25, 0.9); --border: rgba(0, 242, 255, 0.15);
+            --bg: #05050a; --card-bg: rgba(20, 20, 35, 0.6); --border: rgba(0, 242, 255, 0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         body { 
             background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; 
             height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% -20%, #1a1a35 0%, var(--bg) 100%);
         }
+
+        /* HEADER */
         header {
-            height: 70px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            height: 80px; background: rgba(0,0,0,0.7); backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border); display: flex;
-            justify-content: space-between; align-items: center; padding: 0 30px;
+            justify-content: space-between; align-items: center; padding: 0 40px;
         }
-        .wrapper { display: grid; grid-template-columns: 280px 1fr 300px; height: calc(100vh - 70px); padding: 20px; gap: 20px; }
-        .sidebar { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; }
-        .feed-container { overflow-y: auto; padding-right: 10px; }
-        .card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
-            border-radius: 20px; padding: 25px; margin-bottom: 20px;
+        .profile-box { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--border); }
+
+        /* GRID SYSTEM */
+        .app-container { display: grid; grid-template-columns: 300px 1fr 320px; height: calc(100vh - 80px); padding: 25px; gap: 25px; }
+
+        .glass-panel { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 30px; padding: 25px; display: flex; flex-direction: column; }
+
+        /* FEED */
+        .feed { overflow-y: auto; scroll-behavior: smooth; padding-right: 10px; }
+        .feed::-webkit-scrollbar { width: 4px; }
+        .feed::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .post-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            padding: 30px; border-radius: 25px; margin-bottom: 20px; position: relative;
+            animation: fadeIn 0.4s ease forwards;
         }
-        .nav-item { padding: 12px; margin-bottom: 5px; border-radius: 12px; cursor: pointer; color: #555; font-weight: 700; }
-        .nav-item.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); }
-        .btn { background: var(--primary); border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; color: #000; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 100; }
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; }
+        .post-card:hover { border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,242,255,0.05); transform: translateY(-3px); }
+
+        /* UI ELEMENTS */
+        .nav-btn {
+            padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; cursor: pointer;
+            font-weight: 700; color: #555; transition: 0.3s; display: flex; align-items: center; gap: 12px;
+        }
+        .nav-btn.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); box-shadow: inset 4px 0 0 var(--primary); }
+
+        .btn-action {
+            background: var(--primary); border: none; padding: 18px; border-radius: 18px;
+            font-weight: 800; cursor: pointer; color: #000; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-action:hover { box-shadow: 0 0 25px rgba(0,242,255,0.4); transform: scale(1.02); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(10px); }
+        .modal-content { background: #0a0a1a; padding: 40px; border-radius: 35px; width: 450px; border: 1px solid var(--primary); }
+
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 15px; border-radius: 15px; color: #fff; margin-bottom: 15px; font-size: 0.9rem; }
+        input:focus { border-color: var(--primary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -40,103 +70,144 @@
 <script src="news-data.js"></script>
 
 <header>
-    <h2 style="color: var(--primary);">WHALES HUB</h2>
-    <div style="display: flex; align-items: center; gap: 15px;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <a href="index.html" style="text-decoration:none; color:#555; font-weight:800; font-size:0.8rem;">← ГОЛОВНА</a>
+        <h1 style="font-size: 1.4rem; letter-spacing: 4px; font-weight: 800; color: var(--primary);">WHALES HUB</h1>
+    </div>
+
+    <div class="profile-box">
         <div style="text-align: right;">
-            <p id="p-name" style="font-weight: 800;">Steve</p>
-            <p style="font-size: 0.6rem; color: #00ff88;">ONLINE</p>
+            <p id="p-name" style="font-weight: 800; font-size: 0.9rem;">Steve</p>
+            <p style="font-size: 0.6rem; color: #00ff88; font-weight: 800;">CONNECTED</p>
         </div>
-        <img id="p-head" src="" style="width: 40px; border-radius: 8px; border: 1px solid var(--primary);">
+        <img id="p-head" src="" style="width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--primary);">
     </div>
 </header>
 
-<div class="wrapper">
-    <aside class="sidebar">
-        <input type="text" oninput="App.search(this.value)" placeholder="Пошук..." style="margin-bottom: 20px;">
-        <div class="nav-item active" onclick="App.setTab('news', this)">Новини</div>
-        <div class="nav-item" onclick="App.setTab('update', this)">Оновлення</div>
-        <div class="nav-item" onclick="App.setTab('project', this)">Проєкти</div>
-        <button class="btn" onclick="App.openModal()" style="margin-top: auto;">+ НОВИЙ ЗАПИС</button>
+<div class="app-container">
+    <aside class="glass-panel">
+        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px; letter-spacing: 2px; font-weight: 800;">NAVIGATOR</p>
+        <div class="nav-btn active" onclick="App.tab('news', this)">📢 Новини</div>
+        <div class="nav-btn" onclick="App.tab('update', this)">✨ Оновлення</div>
+        <div class="nav-btn" onclick="App.tab('project', this)">🏗️ Проєкти</div>
+        <div class="nav-btn" onclick="App.tab('idea', this)">💡 Пропозиції</div>
+        
+        <button class="btn-action" onclick="App.openModal()" style="margin-top: auto;">+ Створити запис</button>
     </aside>
 
-    <main class="feed-container" id="feed"></main>
+    <main class="feed" id="feed-root"></main>
 
-    <aside class="sidebar">
-        <p style="font-size: 0.7rem; color: #444; margin-bottom: 10px;">СТАТИСТИКА</p>
-        <h1 id="stat-total" style="color: var(--primary);">0</h1>
+    <aside class="glass-panel">
+        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px; letter-spacing: 2px; font-weight: 800;">STATISTICS</p>
+        <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px;">
+            <p style="font-size: 0.7rem; color: #666;">АКТИВНІСТЬ ХАБУ</p>
+            <h2 id="total-count" style="font-size: 2.5rem; color: var(--primary);">0</h2>
+        </div>
+        <div style="margin-top: auto; padding: 20px; background: rgba(112,0,255,0.05); border-radius: 20px; border: 1px solid rgba(112,0,255,0.1);">
+            <p style="font-size: 0.6rem; color: var(--secondary); font-weight: 800;">BUILD STATUS</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Всі модулі синхронізовано.</p>
+        </div>
     </aside>
 </div>
 
-<div class="modal" id="modal">
-    <div style="background: #0a0a15; padding: 30px; border-radius: 20px; width: 400px; border: 1px solid var(--primary);">
-        <select id="f-type" onchange="App.toggleFields()">
-            <option value="news">Новина</option>
-            <option value="update">Оновлення</option>
-            <option value="project">Проєкт</option>
+<div class="modal-overlay" id="modal-box">
+    <div class="modal-content">
+        <h2 style="margin-bottom: 20px; color: var(--primary);">НОВИЙ ЗАПИС</h2>
+        <select id="f-type" onchange="App.toggleExtra()">
+            <option value="news">📢 Новина</option>
+            <option value="update">✨ Оновлення</option>
+            <option value="project">🏗️ Проєкт</option>
+            <option value="idea">💡 Пропозиція</option>
         </select>
         <input type="text" id="f-title" placeholder="Заголовок">
-        <textarea id="f-desc" placeholder="Опис..."></textarea>
+        <textarea id="f-desc" rows="4" placeholder="Ваше повідомлення..."></textarea>
+        
         <div id="f-extra" style="display: none;">
-            <input type="number" id="f-prog" placeholder="Прогрес %">
-            <input type="text" id="f-coords" placeholder="Координати">
+            <input type="number" id="f-prog" placeholder="Відсоток прогресу (0-100)">
+            <input type="text" id="f-coords" placeholder="Координати (напр. X: 100, Z: -200)">
         </div>
-        <button class="btn" style="width: 100%;" onclick="App.save()">ОПУБЛІКУВАТИ</button>
-        <button onclick="App.closeModal()" style="background:none; border:none; color:#444; width:100%; margin-top:10px; cursor:pointer;">Скасувати</button>
+
+        <button class="btn-action" style="width: 100%;" onclick="App.publish()">ОПУБЛІКУВАТИ</button>
+        <button onclick="App.closeModal()" style="width: 100%; background: none; border: none; color: #444; margin-top: 15px; cursor: pointer; font-weight: 700;">СКАСУВАТИ</button>
     </div>
 </div>
 
 <script>
 const App = {
-    dbKey: 'whales_local_v1',
+    key: 'whales_ultra_db',
+    userKey: 'playerNick',
     currentTab: 'news',
-    data: [],
+    allData: [],
 
     init() {
-        const nick = localStorage.getItem('playerNick') || "Steve";
+        // Налаштування профілю
+        const nick = localStorage.getItem(this.userKey) || "Steve";
         document.getElementById('p-name').innerText = nick;
-        document.getElementById('p-head').src = `https://mc-heads.net/avatar/${nick}/40`;
-        
-        this.load();
+        document.getElementById('p-head').src = `https://mc-heads.net/avatar/${nick}/100`;
+
+        this.sync();
     },
 
-    load() {
-        const local = JSON.parse(localStorage.getItem(this.dbKey) || "[]");
+    sync() {
+        // Локальні дані
+        const local = JSON.parse(localStorage.getItem(this.key) || "[]");
+        
+        // Офіційні дані (безпечна перевірка)
         let official = [];
-        
-        if (typeof WHALES_STORAGE !== 'undefined' && WHALES_STORAGE.posts) {
-            official = WHALES_STORAGE.posts;
-            console.log("✅ Синхронізовано з news-data.js");
+        if (window.WHALES_STORAGE && window.WHALES_STORAGE.posts) {
+            official = window.WHALES_STORAGE.posts;
         }
-        
-        this.data = [...local, ...official].sort((a,b) => b.id - a.id);
+
+        this.allData = [...local, ...official].sort((a, b) => b.id - a.id);
         this.render();
     },
 
-    render(customData = null) {
-        const feed = document.getElementById('feed');
-        feed.innerHTML = '';
-        const items = customData || this.data.filter(i => i.type === this.currentTab);
+    render(filtered = null) {
+        const root = document.getElementById('feed-root');
+        root.innerHTML = '';
         
-        items.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.innerHTML = `
-                <small style="color:var(--primary)">${item.type.toUpperCase()} // ${item.date}</small>
-                <h2 style="margin: 5px 0;">${item.title}</h2>
-                <p style="color:#888">${item.desc}</p>
-                ${item.type === 'project' ? `<p style="font-size:0.7rem; margin-top:10px; color:var(--primary)">ПРОГРЕС: ${item.prog}% | ${item.coords}</p>` : ''}
+        const source = filtered || this.allData.filter(item => item.type === this.currentTab);
+        document.getElementById('total-count').innerText = this.allData.length;
+
+        if (source.length === 0) {
+            root.innerHTML = `<div style="text-align:center; padding-top:100px; color:#222; font-weight:800; font-size:2rem; letter-spacing:10px;">EMPTY</div>`;
+            return;
+        }
+
+        source.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-family:'JetBrains Mono'; font-size:0.7rem; color:#444;">
+                    <span style="color:var(--primary); font-weight:800;">#${item.type.toUpperCase()}</span>
+                    <span>${item.date} // ${item.author}</span>
+                </div>
+                <h2 style="margin-bottom:10px; font-size:1.4rem;">${item.title}</h2>
+                <p style="color:#888; line-height:1.6; font-size:0.9rem;">${item.desc.replace(/\n/g, '<br>')}</p>
+                
+                ${item.type === 'project' ? `
+                    <div style="margin-top:20px; background:rgba(0,0,0,0.3); padding:15px; border-radius:15px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--primary); margin-bottom:8px;">
+                            <span>PROGRESS</span><span>${item.prog}%</span>
+                        </div>
+                        <div style="height:6px; background:#000; border-radius:10px; overflow:hidden;">
+                            <div style="width:${item.prog}%; height:100%; background:linear-gradient(90deg, var(--primary), var(--secondary)); shadow: 0 0 10px var(--primary);"></div>
+                        </div>
+                        <p style="font-size:0.65rem; color:#333; margin-top:10px; font-family:'JetBrains Mono';">LOC: ${item.coords}</p>
+                    </div>
+                ` : ''}
             `;
-            feed.appendChild(div);
+            root.appendChild(card);
         });
-        document.getElementById('stat-total').innerText = this.data.length;
     },
 
-    save() {
+    publish() {
         const title = document.getElementById('f-title').value;
         const desc = document.getElementById('f-desc').value;
-        if(!title || !desc) return alert("Заповніть поля!");
+        
+        if (!title || !desc) return alert("Заповніть всі поля!");
 
-        const post = {
+        const newPost = {
             id: Date.now(),
             author: document.getElementById('p-name').innerText,
             type: document.getElementById('f-type').value,
@@ -146,34 +217,40 @@ const App = {
             date: new Date().toLocaleDateString('uk-UA')
         };
 
-        const local = JSON.parse(localStorage.getItem(this.dbKey) || "[]");
-        local.unshift(post);
-        localStorage.setItem(this.dbKey, JSON.stringify(local));
+        const local = JSON.parse(localStorage.getItem(this.key) || "[]");
+        local.unshift(newPost);
+        localStorage.setItem(this.key, JSON.stringify(local));
 
-        this.load();
+        // Очищення та оновлення
+        document.getElementById('f-title').value = '';
+        document.getElementById('f-desc').value = '';
+        this.sync();
         this.closeModal();
     },
 
-    search(q) {
-        const filtered = this.data.filter(i => 
-            i.type === this.currentTab && i.title.toLowerCase().includes(q.toLowerCase())
+    search(val) {
+        const query = val.toLowerCase();
+        const filtered = this.allData.filter(i => 
+            i.type === this.currentTab && 
+            (i.title.toLowerCase().includes(query) || i.desc.toLowerCase().includes(query))
         );
         this.render(filtered);
     },
 
-    setTab(t, el) {
-        this.currentTab = t;
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    tab(type, el) {
+        this.currentTab = type;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         this.render();
     },
 
-    openModal() { document.getElementById('modal').style.display = 'flex'; },
-    closeModal() { document.getElementById('modal').style.display = 'none'; },
-    toggleFields() { document.getElementById('f-extra').style.display = document.getElementById('f-type').value === 'project' ? 'block' : 'none'; }
+    openModal() { document.getElementById('modal-box').style.display = 'flex'; },
+    closeModal() { document.getElementById('modal-box').style.display = 'none'; },
+    toggleExtra() { document.getElementById('f-extra').style.display = document.getElementById('f-type').value === 'project' ? 'block' : 'none'; }
 };
 
 window.onload = () => App.init();
 </script>
+
 </body>
 </html>
