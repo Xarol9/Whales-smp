@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALE | QUANTUM LABOR TERMINAL</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         :root {
             --neon: #00f2ff;
-            --neon-bg: rgba(0, 242, 255, 0.05);
             --gold: #ffcc00;
-            --bg-void: #010204;
-            --panel-glass: rgba(10, 12, 18, 0.9);
-            --border-line: rgba(0, 242, 255, 0.2);
+            --bg-void: #010206;
+            --border: rgba(0, 242, 255, 0.2);
+            --glass: rgba(5, 10, 20, 0.95);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
@@ -27,139 +26,158 @@
             height: 100vh; overflow: hidden;
         }
 
-        /* Лазерний курсор */
-        #cursor {
-            width: 30px; height: 30px; border: 1px solid var(--neon);
-            position: fixed; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #cursor::after { content: ''; width: 2px; height: 2px; background: #fff; box-shadow: 0 0 10px var(--neon); }
+        /* Фонова матриця даних */
+        #flux-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
 
-        /* Фонова сітка */
-        .grid-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background-image: linear-gradient(var(--border-line) 1px, transparent 1px), linear-gradient(90deg, var(--border-line) 1px, transparent 1px);
-            background-size: 100px 100px; mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
-            opacity: 0.1;
+        /* Кастомний курсор-інтерфейс */
+        #ui-cursor {
+            width: 24px; height: 24px; border: 1px solid var(--neon);
+            position: fixed; pointer-events: none; z-index: 10000;
+            transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;
         }
+        #ui-cursor::after { content: ''; width: 4px; height: 4px; background: #fff; border-radius: 50%; }
 
-        /* Header / Sync Bar */
-        .sync-header {
-            height: 80px; padding: 0 60px;
+        header {
+            height: 80px; padding: 0 40px;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border-line);
-        }
-
-        .sync-status { display: flex; align-items: center; gap: 15px; font-size: 0.6rem; letter-spacing: 2px; }
-        .sync-dot { width: 8px; height: 8px; background: var(--neon); border-radius: 50%; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; box-shadow: 0 0 10px var(--neon); } 100% { opacity: 0.2; } }
-
-        .brand-logo { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; letter-spacing: 15px; }
-
-        .main-layout {
-            display: grid; grid-template-columns: 350px 1fr 350px;
-            height: calc(100vh - 80px); padding: 40px; gap: 40px;
-        }
-
-        .terminal-panel {
-            background: var(--panel-glass); border: 1px solid var(--border-line);
-            padding: 30px; display: flex; flex-direction: column; position: relative;
+            border-bottom: 2px solid var(--border); background: rgba(0,0,0,0.8);
             backdrop-filter: blur(20px);
         }
 
-        .category-btn {
-            padding: 20px; border-left: 2px solid transparent;
-            margin-bottom: 15px; font-size: 0.75rem; color: rgba(255,255,255,0.4);
-            transition: 0.3s;
+        .terminal-status { font-family: 'Orbitron'; font-size: 0.7rem; letter-spacing: 3px; color: var(--neon); }
+        .sync-pulse { width: 10px; height: 10px; background: var(--neon); border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
+
+        .layout {
+            display: grid; grid-template-columns: 320px 1fr 320px;
+            height: calc(100vh - 80px); padding: 30px; gap: 30px;
         }
-        .category-btn:hover { background: var(--neon-bg); color: #fff; padding-left: 30px; }
-        .category-btn.active { border-color: var(--neon); color: var(--neon); background: var(--neon-bg); }
 
-        /* Картки Біржі */
-        .job-feed { overflow-y: auto; padding-right: 20px; }
-        .job-feed::-webkit-scrollbar { width: 2px; }
-        .job-feed::-webkit-scrollbar-thumb { background: var(--neon); }
-
-        .job-card {
-            border: 1px solid var(--border-line); padding: 40px;
-            margin-bottom: 30px; position: relative; transition: 0.4s;
-            background: linear-gradient(135deg, rgba(255,255,255,0.01), transparent);
+        .side-panel {
+            background: var(--glass); border: 1px solid var(--border);
+            padding: 30px; display: flex; flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
         }
-        .job-card:hover { border-color: var(--neon); box-shadow: 0 0 30px var(--neon-bg); transform: translateY(-5px); }
 
-        .job-id { font-size: 0.6rem; color: var(--neon); margin-bottom: 10px; display: block; }
-        .job-card h2 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 15px; }
-        .job-card p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.8; }
+        .nav-link {
+            padding: 20px; margin-bottom: 12px; border: 1px solid transparent;
+            font-size: 0.75rem; color: rgba(255,255,255,0.4); transition: 0.4s;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .nav-link:hover { background: rgba(0,242,255,0.05); color: #fff; }
+        .nav-link.active {
+            border: 1px solid var(--border); color: var(--neon);
+            background: linear-gradient(90deg, rgba(0,242,255,0.1), transparent);
+            text-shadow: 0 0 10px var(--neon);
+        }
 
-        .job-footer {
-            margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-line);
+        .contract-hub { overflow-y: auto; padding-right: 15px; scroll-behavior: smooth; }
+        .contract-hub::-webkit-scrollbar { width: 2px; }
+        .contract-hub::-webkit-scrollbar-thumb { background: var(--neon); }
+
+        .contract-item {
+            background: rgba(255,255,255,0.01); border: 1px solid var(--border);
+            padding: 40px; margin-bottom: 20px; position: relative;
+            transition: 0.5s; animation: emerge 0.6s ease-out;
+        }
+        .contract-item:hover { 
+            border-color: var(--neon); background: rgba(0,242,255,0.03);
+            transform: scale(1.005);
+        }
+
+        .contract-item h2 { font-family: 'Orbitron'; font-size: 1.6rem; margin-bottom: 15px; letter-spacing: 1px; }
+        .contract-item p { color: rgba(255,255,255,0.5); font-size: 1rem; line-height: 1.8; }
+
+        .footer-data {
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
+        .reward-box { font-family: 'Orbitron'; color: var(--gold); font-size: 1.1rem; font-weight: 700; }
+        .diff-badge { font-size: 0.6rem; padding: 3px 10px; border: 1px solid #ff0055; color: #ff0055; }
 
-        .salary { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
-
-        .nexus-btn {
+        .back-origin {
             margin-top: auto; padding: 20px; border: 1px solid var(--neon);
             text-align: center; color: var(--neon); font-family: 'Syncopate';
-            font-size: 0.6rem; letter-spacing: 5px; text-decoration: none; transition: 0.4s;
+            font-size: 0.65rem; text-decoration: none; transition: 0.4s;
         }
-        .nexus-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 40px var(--neon); }
+        .back-origin:hover { background: var(--neon); color: #000; box-shadow: 0 0 30px var(--neon); }
 
-        .stat-box { margin-bottom: 40px; }
-        .stat-val { font-size: 4rem; font-family: 'Orbitron'; line-height: 1; margin: 10px 0; }
+        .stat-val { font-size: 5rem; font-family: 'Orbitron'; line-height: 1; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div class="grid-bg"></div>
+<canvas id="flux-canvas"></canvas>
+<div id="ui-cursor"></div>
 
-<header class="sync-header">
-    <div class="sync-status">
-        <div class="sync-dot"></div>
-        <span>QUANTUM_SYNC: <span id="sync-text">ESTABLISHING...</span></span>
+<header>
+    <div class="terminal-status">TERMINAL_ACTIVE // SEC_09</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="sync-pulse"></div>
+        <span style="font-size:0.6rem; letter-spacing:2px;">SYNCING_LIVE_CONTRACTS...</span>
     </div>
-    <div class="brand-logo">ALE_SYSTEM</div>
-    <div style="font-size: 0.6rem; color: var(--neon);">v5.0.2 // ARCH: X64</div>
+    <div style="font-family:'Syncopate'; font-size:0.9rem; letter-spacing:5px;">ALE_EXCHANGE</div>
 </header>
 
-<div class="main-layout">
-    <aside class="terminal-panel">
-        <p style="font-size: 0.5rem; color: var(--neon); margin-bottom: 30px; opacity: 0.6;">// SELECT_SECTOR</p>
-        <div class="category-btn active" onclick="App.setTab('news', this)">01. GLOBAL_BOARD</div>
-        <div class="category-btn" onclick="App.setTab('update', this)">02. SYSTEM_TASKS</div>
-        <div class="category-btn" onclick="App.setTab('project', this)">03. ARCHITECT_LIST</div>
-        
-        <a href="index.html" class="nexus-btn">EXIT_TO_NEXUS</a>
+<div class="layout">
+    <aside class="side-panel">
+        <p style="font-size:0.5rem; color:var(--neon); margin-bottom:30px;">// CONTRACT_SECTORS</p>
+        <div class="nav-link active" onclick="App.setTab('news', this)">01. GLOBAL_BOARD</div>
+        <div class="nav-link" onclick="App.setTab('update', this)">02. TECH_MAINTENANCE</div>
+        <div class="nav-link" onclick="App.setTab('project', this)">03. MEGA_STRUCTURES</div>
+
+        <a href="index.html" class="back-origin">DISCONNECT_TERMINAL</a>
     </aside>
 
-    <main class="job-feed" id="feed"></main>
+    <main class="contract-hub" id="feed"></main>
 
-    <aside class="terminal-panel">
-        <p style="font-size: 0.5rem; color: var(--neon); margin-bottom: 30px; opacity: 0.6;">// USER_METRICS</p>
-        
-        <div class="stat-box">
-            <span style="font-size: 0.6rem; color: rgba(255,255,255,0.4);">ACTIVE_OFFERS</span>
+    <aside class="side-panel">
+        <div style="border-left: 2px solid var(--neon); padding-left: 20px; margin-bottom: 50px;">
+            <p style="font-size:0.5rem; opacity:0.5;">ACTIVE_ORDERS</p>
             <div class="stat-val" id="stat-total">00</div>
         </div>
 
-        <div style="border: 1px solid var(--border-line); padding: 25px; margin-top: auto; display: flex; align-items: center; gap: 20px;">
-            <img id="p-head" src="" style="width: 45px; height: 45px; border: 1px solid var(--neon);">
+        <div style="margin-top:auto; padding:20px; border:1px solid var(--border); display:flex; align-items:center; gap:15px;">
+            <img id="p-head" src="" style="width: 50px; height: 50px; border: 1px solid var(--neon);">
             <div>
-                <p id="p-name" style="font-size: 0.8rem; font-weight: 700; color: #fff;">USER</p>
-                <p style="font-size: 0.5rem; color: var(--neon); opacity: 0.7;">RANK: APPRENTICE</p>
+                <p id="p-name" style="font-size:0.8rem; font-weight:700;">USER_NAME</p>
+                <p style="font-size:0.5rem; color:var(--neon);">LEVEL: CERTIFIED</p>
             </div>
         </div>
     </aside>
 </div>
 
 <script src="news-data.js"></script>
+
 <script>
+// Симуляція потоку даних (Canvas)
+const canvas = document.getElementById('flux-canvas');
+const ctx = canvas.getContext('2d');
+let dots = [];
+
+function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    for(let i=0; i<60; i++) dots.push({
+        x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+        v: Math.random()*0.5 + 0.1
+    });
+}
+function draw() {
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0, 242, 255, 0.3)";
+    dots.forEach(d => {
+        ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI*2); ctx.fill();
+        d.y += d.v; if(d.y > canvas.height) d.y = 0;
+    });
+    requestAnimationFrame(draw);
+}
+init(); draw();
+
 // Керування курсором
 document.addEventListener('mousemove', e => {
-    document.getElementById('cursor').style.left = e.clientX + 'px';
-    document.getElementById('cursor').style.top = e.clientY + 'px';
+    $('#ui-cursor').css({ left: e.clientX, top: e.clientY });
 });
 
 const App = {
@@ -167,15 +185,10 @@ const App = {
     data: [],
 
     init() {
-        const nick = localStorage.getItem('playerNick') || "Steve";
+        const nick = localStorage.getItem('playerNick') || "Player";
         $('#p-name').text(nick.toUpperCase());
         $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/64`);
-        
-        // Симуляція синхронізації
-        setTimeout(() => {
-            $('#sync-text').text('CONNECTED').css('color', 'var(--neon)');
-            this.load();
-        }, 1500);
+        this.load();
     },
 
     load() {
@@ -192,23 +205,15 @@ const App = {
         
         items.forEach((item, index) => {
             $feed.append(`
-                <div class="job-card" style="animation: slide 0.6s ${index * 0.1}s cubic-bezier(0,1,0,1) forwards; opacity:0;">
-                    <span class="job-id">ORDER_ID: #${item.id}</span>
+                <div class="contract-item" style="animation-delay: ${index * 0.1}s">
+                    <span style="font-size:0.6rem; color:var(--neon);">REF_ID: #${item.id}</span>
                     <h2>${item.title.toUpperCase()}</h2>
                     <p>${item.desc}</p>
                     
-                    <div class="job-footer">
-                        <span class="salary"><i class="fa-solid fa-coins" style="margin-right:10px;"></i> REWARD: ${Math.floor(Math.random()*1000 + 500)} Credits</span>
-                        <span style="font-size: 0.6rem; color: rgba(255,255,255,0.3); font-family: 'JetBrains Mono';">DATE: ${item.date}</span>
+                    <div class="footer-data">
+                        <span class="reward-box"><i class="fa-solid fa-credit-card"></i> ${Math.floor(Math.random()*4000 + 1000)} CR</span>
+                        <span class="diff-badge">${item.type === 'project' ? 'ELITE' : 'NORMAL'}</span>
                     </div>
-                    
-                    ${item.type === 'project' ? `
-                        <div style="margin-top:20px;">
-                            <div style="height:1px; background:var(--border-line); position:relative;">
-                                <div style="width:${item.prog}%; height:100%; background:var(--neon); box-shadow:0 0 10px var(--neon);"></div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             `);
         });
@@ -217,7 +222,7 @@ const App = {
 
     setTab(t, el) {
         this.currentTab = t;
-        $('.category-btn').removeClass('active');
+        $('.nav-link').removeClass('active');
         $(el).addClass('active');
         this.render();
     }
@@ -227,7 +232,7 @@ $(window).on('load', () => App.init());
 </script>
 
 <style>
-@keyframes slide { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes emerge { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </body>
 </html>
