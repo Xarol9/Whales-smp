@@ -17,7 +17,7 @@
             --border: rgba(0, 242, 255, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.25s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         body { 
             background: var(--bg); color: #fff; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -25,7 +25,6 @@
             background-image: radial-gradient(circle at 50% -20%, #1a1a35 0%, var(--bg) 100%);
         }
 
-        /* HEADER */
         header {
             height: 70px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border); display: flex;
@@ -39,7 +38,6 @@
         }
         .btn-nav:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
 
-        /* LAYOUT */
         .wrapper { display: grid; grid-template-columns: 280px 1fr 300px; height: calc(100vh - 70px); padding: 20px; gap: 20px; }
 
         .sidebar { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; }
@@ -48,7 +46,6 @@
         .feed-container::-webkit-scrollbar { width: 5px; }
         .feed-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-        /* SEARCH BAR */
         .search-box {
             background: rgba(0,0,0,0.3); border: 1px solid var(--border);
             padding: 12px 15px; border-radius: 12px; margin-bottom: 20px;
@@ -57,44 +54,41 @@
             background: none; border: none; color: #fff; width: 100%; outline: none; font-size: 0.85rem;
         }
 
-        /* NAV ITEMS */
         .nav-item {
             padding: 14px 18px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
             font-weight: 700; color: #555; display: flex; align-items: center; gap: 15px;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.03); color: #999; }
         .nav-item.active { 
             background: linear-gradient(90deg, rgba(0, 242, 255, 0.08) 0%, transparent 100%);
-            color: var(--primary); border-left: 4px solid var(--primary); border-color: var(--border);
+            color: var(--primary); border-left: 4px solid var(--primary);
         }
 
-        /* CARDS */
         .card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px; padding: 30px; margin-bottom: 20px; animation: slideUp 0.5s ease;
+            border-radius: 24px; padding: 30px; margin-bottom: 20px; animation: slideUp 0.4s ease;
         }
-        .card:hover { border-color: var(--primary); background: rgba(255,255,255,0.03); transform: translateY(-3px); }
-
         .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.65rem; font-family: 'JetBrains Mono'; }
+        
         .tag { padding: 4px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
         .tag-news { background: rgba(0, 242, 255, 0.1); color: var(--primary); }
+        .tag-update { background: rgba(241, 196, 15, 0.1); color: var(--update); }
         .tag-project { background: rgba(112, 0, 255, 0.1); color: var(--secondary); }
+        .tag-idea { background: rgba(255, 255, 255, 0.05); color: #fff; }
 
-        .prog-track { height: 8px; background: #000; border-radius: 20px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .prog-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .prog-track { height: 8px; background: #000; border-radius: 20px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); }
+        .prog-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); box-shadow: 0 0 10px var(--primary); }
 
-        /* MODAL */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
             display: none; justify-content: center; align-items: center; z-index: 2000;
         }
-        .modal-box { background: #0a0a15; border: 1px solid var(--primary); padding: 40px; border-radius: 32px; width: 500px; box-shadow: 0 0 60px rgba(0, 242, 255, 0.1); }
+        .modal-box { background: #0a0a15; border: 1px solid var(--primary); padding: 40px; border-radius: 32px; width: 500px; box-shadow: 0 0 50px rgba(0, 242, 255, 0.15); }
 
         input, textarea, select { width: 100%; background: #000; border: 1px solid #222; padding: 14px; border-radius: 14px; color: #fff; margin: 10px 0; font-family: inherit; outline: none; }
-        input:focus, textarea:focus { border-color: var(--primary); }
+        input:focus { border-color: var(--primary); }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -104,15 +98,15 @@
 <header>
     <div style="display: flex; gap: 20px; align-items: center;">
         <a href="index.html" class="btn-nav">← ГОЛОВНА</a>
-        <h2 style="letter-spacing: 2px; font-weight: 800; color: var(--primary);">WHALES HUB</h2>
+        <h2 style="letter-spacing: 2px; font-weight: 800; color: var(--primary); font-size: 1.1rem;">WHALES HUB</h2>
     </div>
 
     <div style="display: flex; align-items: center; gap: 20px;">
         <div style="text-align: right;">
-            <p id="player-name" style="font-weight: 800; font-size: 0.9rem;">Завантаження...</p>
+            <p id="player-name" style="font-weight: 800; font-size: 0.9rem;">Steve</p>
             <p id="server-online" style="font-size: 0.6rem; color: var(--success); font-weight: 700;">ONLINE: 0/50</p>
         </div>
-        <img id="player-head" src="" style="width: 40px; border-radius: 10px; border: 1.5px solid var(--primary); background: #000;">
+        <img id="player-head" src="" style="width: 42px; border-radius: 12px; border: 1.5px solid var(--primary); background: #000;">
         <button class="btn-nav" onclick="App.logout()" style="color: var(--danger); border-color: rgba(255, 42, 109, 0.2);">ВИЙТИ</button>
     </div>
 </header>
@@ -129,63 +123,67 @@
         <div class="nav-item" onclick="App.setTab('project', this)"><span>🏗️</span> Проєкти</div>
         <div class="nav-item" onclick="App.setTab('idea', this)"><span>💡</span> Пропозиції</div>
 
-        <button onclick="App.openModal()" style="margin-top: auto; padding: 20px; background: var(--primary); border: none; border-radius: 16px; font-weight: 800; cursor: pointer; color: #000;">+ НОВИЙ ЗАПИС</button>
+        <button onclick="App.openModal()" style="margin-top: auto; padding: 20px; background: var(--primary); border: none; border-radius: 16px; font-weight: 800; cursor: pointer; color: #000; font-size: 0.85rem;">+ НОВИЙ ЗАПИС</button>
     </aside>
 
     <main class="feed-container" id="feed"></main>
 
     <aside class="sidebar">
-        <h3 style="font-size: 0.8rem; margin-bottom: 20px; color: var(--primary);">СТАТИСТИКА</h3>
-        <div class="card" style="padding: 15px; margin-bottom: 15px; border: none; background: rgba(255,255,255,0.03);">
-            <p style="font-size: 0.6rem; color: #555;">УСЬОГО ПУБЛІКАЦІЙ</p>
-            <p id="stat-total" style="font-weight: 800; font-size: 1.5rem; color: var(--primary);">0</p>
+        <h3 style="font-size: 0.8rem; margin-bottom: 25px; color: var(--primary); letter-spacing: 1px;">SYSTEM STATUS</h3>
+        <div class="card" style="padding: 18px; margin-bottom: 15px; border: none; background: rgba(255,255,255,0.03);">
+            <p style="font-size: 0.6rem; color: #555; margin-bottom: 5px;">TOTAL RECORDS</p>
+            <p id="stat-total" style="font-weight: 800; font-size: 1.6rem; color: var(--primary);">0</p>
         </div>
-        <div class="card" style="padding: 15px; border: none; background: rgba(255,255,255,0.03);">
-            <p style="font-size: 0.6rem; color: #555;">ВАШІ ЗАПИСИ</p>
-            <p id="stat-user" style="font-weight: 800; font-size: 1.5rem; color: var(--secondary);">0</p>
+        <div class="card" style="padding: 18px; border: none; background: rgba(255,255,255,0.03);">
+            <p style="font-size: 0.6rem; color: #555; margin-bottom: 5px;">YOUR ACTIVITY</p>
+            <p id="stat-user" style="font-weight: 800; font-size: 1.6rem; color: var(--secondary);">0</p>
         </div>
-        <div style="margin-top: auto; text-align: center; font-size: 0.5rem; color: #333; font-family: 'JetBrains Mono';">
-            WHALES_OS v2.1 // ENCRYPTED
+        <div style="margin-top: auto; text-align: center; opacity: 0.2;">
+            <p style="font-size: 0.5rem; font-family: 'JetBrains Mono';">CORE v2.5.8 // STABLE</p>
         </div>
     </aside>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-box">
-        <h2 style="color: var(--primary); margin-bottom: 15px;">НОВИЙ ЗАПИС</h2>
+        <h2 style="color: var(--primary); margin-bottom: 15px; letter-spacing: 1px;">СТВОРЕННЯ</h2>
         <select id="f-type" onchange="App.toggleFields()">
-            <option value="news">Новина</option>
-            <option value="update">Оновлення</option>
-            <option value="project">Проєкт</option>
-            <option value="idea">Пропозиція</option>
+            <option value="news">📢 Новина</option>
+            <option value="update">✨ Оновлення</option>
+            <option value="project">🏗️ Проєкт</option>
+            <option value="idea">💡 Пропозиція</option>
         </select>
         <input type="text" id="f-title" placeholder="Заголовок">
         <textarea id="f-desc" rows="5" placeholder="Ваш текст..."></textarea>
 
         <div id="f-project-extra" style="display: none;">
             <input type="number" id="f-prog" placeholder="Прогрес % (0-100)">
-            <input type="text" id="f-coords" placeholder="Координати">
+            <input type="text" id="f-coords" placeholder="Координати (X Y Z)">
         </div>
 
-        <button onclick="App.save()" style="width: 100%; padding: 18px; background: var(--primary); border: none; border-radius: 14px; font-weight: 800; cursor: pointer; color: #000; margin-top: 15px;">ОПУБЛІКУВАТИ</button>
-        <button onclick="App.closeModal()" style="width: 100%; background: none; border: none; color: #444; margin-top: 10px; cursor: pointer;">СКАСУВАТИ</button>
+        <button onclick="App.save()" style="width: 100%; padding: 18px; background: var(--primary); border: none; border-radius: 14px; font-weight: 800; cursor: pointer; color: #000; margin-top: 15px; font-size: 0.9rem;">ОПУБЛІКУВАТИ</button>
+        <button onclick="App.closeModal()" style="width: 100%; background: none; border: none; color: #444; margin-top: 10px; cursor: pointer; font-size: 0.7rem; font-weight: 700;">СКАСУВАТИ</button>
     </div>
 </div>
 
 <script>
+/**
+ * WHALES HUB - LIVE SYSTEM
+ */
 const App = {
-    storageKey: 'whales_db_live',
+    storageKey: 'whales_db_stable',
     userKey: 'playerNick',
     data: [],
     currentUser: '',
     currentTab: 'news',
 
     init() {
-        // Завантажуємо профіль
+        // 1. Користувач
         this.currentUser = localStorage.getItem(this.userKey) || "Steve";
         document.getElementById('player-name').innerText = this.currentUser;
-        document.getElementById('player-head').src = `https://mc-heads.net/avatar/${this.currentUser}/40`;
+        document.getElementById('player-head').src = `https://mc-heads.net/avatar/${this.currentUser}/42`;
 
+        // 2. Дані
         this.loadData();
         this.render();
         this.updateStats();
@@ -195,9 +193,14 @@ const App = {
     loadData() {
         const raw = localStorage.getItem(this.storageKey);
         const local = raw ? JSON.parse(raw) : [];
-        const official = (typeof WHALES_STORAGE !== 'undefined') ? WHALES_STORAGE.posts : [];
         
-        this.data = [...local, ...official].sort((a,b) => b.id - a.id);
+        // БЕЗПЕЧНЕ завантаження офіційних даних
+        let official = [];
+        if (typeof WHALES_STORAGE !== 'undefined' && WHALES_STORAGE.posts) {
+            official = WHALES_STORAGE.posts;
+        }
+
+        this.data = [...local, ...official].sort((a, b) => b.id - a.id);
     },
 
     search(query) {
@@ -212,7 +215,7 @@ const App = {
     save() {
         const title = document.getElementById('f-title').value;
         const desc = document.getElementById('f-desc').value;
-        if(!title || !desc) return alert("Будь ласка, заповніть усі поля!");
+        if (!title || !desc) return alert("Заповніть усі поля!");
 
         const entry = {
             id: Date.now(),
@@ -220,20 +223,20 @@ const App = {
             type: document.getElementById('f-type').value,
             title, desc,
             prog: document.getElementById('f-prog').value || 0,
-            coords: document.getElementById('f-coords').value || "Не вказано",
+            coords: document.getElementById('f-coords').value || "Unknown",
             date: new Date().toLocaleDateString('uk-UA')
         };
 
-        const db = JSON.parse(localStorage.getItem(this.storageKey) || "[]");
-        db.unshift(entry);
-        localStorage.setItem(this.storageKey, JSON.stringify(db));
+        const localDB = JSON.parse(localStorage.getItem(this.storageKey) || "[]");
+        localDB.unshift(entry);
+        localStorage.setItem(this.storageKey, JSON.stringify(localDB));
 
         this.loadData();
         this.closeModal();
         this.render();
         this.updateStats();
         
-        // Очищення полів
+        // Clear
         document.getElementById('f-title').value = '';
         document.getElementById('f-desc').value = '';
     },
@@ -243,8 +246,8 @@ const App = {
         feed.innerHTML = '';
         const items = customData || this.data.filter(i => i.type === this.currentTab);
 
-        if(items.length === 0) {
-            feed.innerHTML = '<p style="text-align:center; color:#222; margin-top:100px; font-weight:800; letter-spacing:3px;">БАЗА ДАНИХ ПОРОЖНЯ</p>';
+        if (items.length === 0) {
+            feed.innerHTML = '<div style="text-align:center; padding:100px; color:#222; font-weight:800; letter-spacing:5px;">NO DATA FOUND</div>';
             return;
         }
 
@@ -254,20 +257,22 @@ const App = {
             card.innerHTML = `
                 <div class="card-header">
                     <span class="tag tag-${item.type}">${item.type}</span>
-                    <span>${item.date} // USER: <b style="color:var(--primary)">${item.author}</b></span>
+                    <span style="color:#555;">${item.date} // USER: <b style="color:var(--primary)">${item.author}</b></span>
                 </div>
                 <h2>${item.title}</h2>
-                <p style="color:#888; margin:15px 0; line-height:1.6;">${item.desc}</p>
+                <p style="color:#888; margin:15px 0; font-size:0.95rem; line-height:1.6;">${item.desc}</p>
                 ${item.type === 'project' ? `
-                    <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--primary); margin-bottom:5px;">
-                            <span>PROGRESS</span><span>${item.prog}%</span>
+                    <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:14px; border:1px solid rgba(255,255,255,0.03);">
+                        <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--primary); margin-bottom:8px; font-weight:800;">
+                            <span>BUILD PROGRESS</span><span>${item.prog}%</span>
                         </div>
                         <div class="prog-track"><div class="prog-bar" style="width:${item.prog}%"></div></div>
-                        <p style="font-size:0.6rem; color:#444;">COORDS: ${item.coords}</p>
+                        <p style="font-size:0.6rem; color:#444; font-family:'JetBrains Mono';">LOC: ${item.coords}</p>
                     </div>
                 ` : ''}
-                ${item.author === this.currentUser ? `<button onclick="App.delete(${item.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; font-weight:800; margin-top:15px; opacity:0.5;">[ ВИДАЛИТИ ЗАПИС ]</button>` : ''}
+                ${item.author === this.currentUser ? `
+                    <button onclick="App.delete(${item.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; font-weight:800; margin-top:20px; opacity:0.3; letter-spacing:1px;">[ DELETE_ENTRY ]</button>
+                ` : ''}
             `;
             feed.appendChild(card);
         });
@@ -286,16 +291,16 @@ const App = {
     },
 
     startOnline() {
-        const setOnline = () => {
-            const n = Math.floor(Math.random() * 8) + 12;
-            document.getElementById('server-online').innerText = `ONLINE: ${n}/50`;
+        const refresh = () => {
+            const num = Math.floor(Math.random() * (24 - 11) + 11);
+            document.getElementById('server-online').innerText = `ONLINE: ${num}/50`;
         };
-        setOnline();
-        setInterval(setOnline, 10000);
+        refresh();
+        setInterval(refresh, 15000);
     },
 
     delete(id) {
-        if(!confirm("Ви впевнені, що хочете видалити цей запис?")) return;
+        if (!confirm("Видалити цей запис назавжди?")) return;
         let db = JSON.parse(localStorage.getItem(this.storageKey) || "[]");
         db = db.filter(i => i.id !== id);
         localStorage.setItem(this.storageKey, JSON.stringify(db));
@@ -307,12 +312,11 @@ const App = {
     openModal() { document.getElementById('modal').style.display = 'flex'; },
     closeModal() { document.getElementById('modal').style.display = 'none'; },
     toggleFields() { document.getElementById('f-project-extra').style.display = document.getElementById('f-type').value === 'project' ? 'block' : 'none'; },
-    logout() { if(confirm("Вийти з системи?")) { localStorage.removeItem(this.userKey); window.location.href = "activate.html"; } }
+    logout() { if (confirm("Завершити сесію?")) { localStorage.removeItem(this.userKey); window.location.href = "activate.html"; } }
 };
 
-// Запуск системи
+// Start
 App.init();
 </script>
-
 </body>
 </html>
