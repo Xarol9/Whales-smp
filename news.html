@@ -3,52 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHALES HUB | НОВИНИ</title>
+    <title>WHALES HUB | DASHBOARD</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         :root {
-            --primary: #00f2ff; --secondary: #7000ff;
-            --bg: #05050a; --panel: rgba(15, 15, 25, 0.9); --border: rgba(0, 242, 255, 0.15);
+            --primary: #00f2ff;
+            --primary-glow: rgba(0, 242, 255, 0.3);
+            --secondary: #7000ff;
+            --bg: #030307;
+            --glass: rgba(15, 15, 25, 0.7);
+            --border: rgba(0, 242, 255, 0.1);
+            --text-main: #e0e0e6;
+            --text-dim: #888891;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body { 
-            background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; 
-            height: 100vh; overflow: hidden;
-            background-image: radial-gradient(circle at 50% -20%, #1a1a35 0%, var(--bg) 100%);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            /* Анімований фон */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
         }
 
+        /* Шапка сайту */
         header {
-            height: 70px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border); display: flex;
-            justify-content: space-between; align-items: center; padding: 0 30px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            position: relative;
+            z-index: 10;
         }
 
-        .wrapper { display: grid; grid-template-columns: 280px 1fr 300px; height: calc(100vh - 70px); padding: 20px; gap: 20px; }
-        .sidebar { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 25px; }
+        .logo {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
 
-        .feed-container { overflow-y: auto; padding-right: 15px; }
-        .feed-container::-webkit-scrollbar { width: 4px; }
+        /* Контейнер */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            height: calc(100vh - 80px);
+            padding: 25px;
+            gap: 25px;
+        }
+
+        /* Бокові панелі */
+        .sidebar {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Навігація */
+        .nav-item {
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item i { font-size: 1.1rem; }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(0, 242, 255, 0.1) 0%, transparent 100%);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            box-shadow: -15px 0 30px -15px var(--primary-glow);
+        }
+
+        /* Стрічка новин */
+        .feed-container {
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .feed-container::-webkit-scrollbar { width: 5px; }
         .feed-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         .card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
-            border-radius: 24px; padding: 30px; margin-bottom: 20px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 35px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out forwards;
+            white-space: pre-line;
         }
 
-        .tag { padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.6rem; text-transform: uppercase; margin-right: 10px; }
-        .tag-news { background: rgba(0, 242, 255, 0.1); color: var(--primary); }
-        .tag-update { background: rgba(112, 0, 255, 0.1); color: var(--secondary); }
-        .tag-project { background: rgba(255, 255, 255, 0.1); color: #fff; }
-
-        .nav-item {
-            padding: 14px 18px; margin-bottom: 8px; border-radius: 14px; cursor: pointer;
-            font-weight: 700; color: #555;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.03) 0%, transparent 100%);
+            pointer-events: none;
         }
-        .nav-item.active { background: rgba(0, 242, 255, 0.1); color: var(--primary); border-left: 4px solid var(--primary); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #bbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card p {
+            color: var(--text-dim);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            border-radius: 10px;
+            background: rgba(0, 242, 255, 0.05);
+            color: var(--primary);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+        }
+
+        /* Профіль */
+        .profile-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 5px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            padding: 25px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
     </style>
 </head>
 <body>
@@ -56,31 +206,54 @@
 <script src="news-data.js"></script>
 
 <header>
-    <h2 style="letter-spacing: 2px; color: var(--primary);">WHALES HUB</h2>
-    <div style="display: flex; align-items: center; gap: 15px;">
+    <div class="logo">WHALES HUB</div>
+    
+    <div class="profile-box">
         <div style="text-align: right;">
             <p id="p-name" style="font-weight: 800; font-size: 0.9rem;">Steve</p>
-            <p style="font-size: 0.6rem; color: #00ff88;">ONLINE: 24/100</p>
+            <p style="font-size: 0.6rem; color: #00ff88; letter-spacing: 1px;">SYSTEM ACTIVE</p>
         </div>
-        <img id="p-head" src="" style="width: 40px; border-radius: 10px; border: 1px solid var(--primary);">
+        <img id="p-head" src="" style="width: 42px; border-radius: 12px; filter: drop-shadow(0 0 5px var(--primary-glow));">
     </div>
 </header>
 
 <div class="wrapper">
     <aside class="sidebar">
-        <p style="font-size: 0.6rem; color: #444; margin-bottom: 15px; font-weight: 800;">КАТЕГОРІЇ</p>
-        <div class="nav-item active" onclick="App.setTab('news', this)">📢 Новини</div>
-        <div class="nav-item" onclick="App.setTab('update', this)">✨ Оновлення</div>
-        <div class="nav-item" onclick="App.setTab('project', this)">🏗️ Проєкти</div>
+        <p style="font-size: 0.65rem; color: var(--text-dim); margin-bottom: 20px; font-weight: 800; letter-spacing: 2px;">КАТЕГОРІЇ</p>
+        
+        <div class="nav-item active" onclick="App.setTab('news', this)">
+            <i class="fa-solid fa-satellite-dish"></i> Головна
+        </div>
+        <div class="nav-item" onclick="App.setTab('update', this)">
+            <i class="fa-solid fa-microchip"></i> Оновлення
+        </div>
+        <div class="nav-item" onclick="App.setTab('project', this)">
+            <i class="fa-solid fa-trowel-bricks"></i> Будівництво
+        </div>
+        
+        <div style="margin-top: auto; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 20px; font-size: 0.7rem; color: var(--text-dim);">
+            <i class="fa-solid fa-shield-halved" style="color: var(--primary); margin-right: 10px;"></i>
+            Версія ядра: 2.5.0-STABLE
+        </div>
     </aside>
 
     <main class="feed-container" id="feed"></main>
 
     <aside class="sidebar">
-        <p style="font-size: 0.6rem; color: #444; margin-bottom: 20px;">ІНФОРМАЦІЯ</p>
-        <div class="card" style="padding: 15px; border: none; background: rgba(255,255,255,0.03);">
-            <p style="font-size: 0.5rem; color: #555;">УСЬОГО НОВИН</p>
-            <h1 id="stat-total" style="color: var(--primary);">0</h1>
+        <p style="font-size: 0.65rem; color: var(--text-dim); margin-bottom: 20px; font-weight: 800; letter-spacing: 2px;">МОНІТОРИНГ</p>
+        
+        <div class="stat-card">
+            <p style="font-size: 0.6rem; color: var(--text-dim); margin-bottom: 10px;">АРХІВ ЗАПИСІВ</p>
+            <div class="stat-val" id="stat-total">0</div>
+        </div>
+
+        <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="padding: 15px; border-radius: 15px; background: rgba(0, 242, 255, 0.05); font-size: 0.7rem; display: flex; justify-content: space-between;">
+                <span>Сервер:</span><span style="color: var(--primary);">В мережі</span>
+            </div>
+            <div style="padding: 15px; border-radius: 15px; background: rgba(112, 0, 255, 0.05); font-size: 0.7rem; display: flex; justify-content: space-between;">
+                <span>TPS:</span><span style="color: var(--secondary);">20.0</span>
+            </div>
         </div>
     </aside>
 </div>
@@ -91,21 +264,15 @@ const App = {
     data: [],
 
     init() {
-        // Профіль
         const nick = localStorage.getItem('playerNick') || "Steve";
         $('#p-name').text(nick);
-        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/40`);
-        
+        $('#p-head').attr('src', `https://mc-heads.net/avatar/${nick}/42`);
         this.load();
     },
 
     load() {
-        // Беремо дані тільки з news-data.js
         if (window.WHALES_STORAGE && window.WHALES_STORAGE.posts) {
             this.data = window.WHALES_STORAGE.posts;
-            console.log("✅ Дані завантажено з реєстру");
-        } else {
-            console.error("❌ Помилка: Реєстр WHALES_STORAGE не знайдено!");
         }
         this.render();
     },
@@ -117,19 +284,38 @@ const App = {
         const items = this.data.filter(i => i.type === this.currentTab);
         
         if (items.length === 0) {
-            $feed.append('<p style="text-align:center; color:#222; margin-top:100px;">НЕМАЄ ЗАПИСІВ У ЦІЙ КАТЕГОРІЇ</p>');
+            $feed.append(`
+                <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.2;">
+                    <i class="fa-solid fa-box-open" style="font-size:4rem; margin-bottom:20px;"></i>
+                    <p>ДАНІ ВІДСУТНІ</p>
+                </div>
+            `);
         }
 
-        items.forEach(item => {
+        items.forEach((item, index) => {
             $feed.append(`
-                <div class="card">
-                    <div style="margin-bottom:15px;">
-                        <span class="tag tag-${item.type}">${item.type}</span>
-                        <small style="color:#444;">${item.date} // ${item.author}</small>
+                <div class="card" style="animation-delay: ${index * 0.1}s">
+                    <div class="meta">
+                        <span class="tag">${item.type}</span>
+                        <span style="color: var(--text-dim); opacity: 0.5;">•</span>
+                        <span><i class="fa-regular fa-calendar" style="margin-right:8px;"></i>${item.date}</span>
+                        <span style="color: var(--text-dim); opacity: 0.5;">•</span>
+                        <span><i class="fa-regular fa-user" style="margin-right:8px;"></i>${item.author}</span>
                     </div>
                     <h2>${item.title}</h2>
-                    <p style="color:#888; margin-top:10px; line-height:1.6;">${item.desc}</p>
-                    ${item.type === 'project' ? `<div style="margin-top:15px; font-size:0.7rem; color:var(--primary)">ПРОГРЕС: ${item.prog}% | ${item.coords}</div>` : ''}
+                    <p>${item.desc}</p>
+                    ${item.type === 'project' ? `
+                        <div style="margin-top:25px; padding:20px; background:rgba(0,0,0,0.2); border-radius:20px; border:1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:10px;">
+                                <span style="color:var(--primary)">ПРОГРЕС БУДІВНИЦТВА</span>
+                                <span>${item.prog}%</span>
+                            </div>
+                            <div style="height:6px; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden;">
+                                <div style="width:${item.prog}%; height:100%; background:linear-gradient(90deg, var(--secondary), var(--primary)); box-shadow: 0 0 10px var(--primary-glow);"></div>
+                            </div>
+                            <p style="font-size:0.6rem; color:var(--text-dim); margin-top:10px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>ЛОКАЦІЯ: ${item.coords}</p>
+                        </div>
+                    ` : ''}
                 </div>
             `);
         });
